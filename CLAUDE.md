@@ -567,9 +567,32 @@ When the main Saucebase repository changes affect documentation:
 
 ## Deployment
 
-Automatic deployment to GitHub Pages occurs when changes are pushed to the `main` branch.
+Automatic deployment to GitHub Pages occurs via GitHub Actions when changes are pushed to the `main` branch.
 
-**GitHub Pages Config:**
+### GitHub Actions Workflow
+
+The deployment workflow is located at `.github/workflows/deploy.yml` and performs the following:
+
+1. **Triggers**: Runs on every push to `main` branch (also supports manual workflow dispatch)
+2. **Build**: Installs dependencies with `npm ci` and builds the site with `npm run build`
+3. **Deploy**: Uploads the `build/` directory and deploys to GitHub Pages
+
+**Workflow features:**
+- Uses Node.js 20 (latest LTS)
+- Implements concurrency control to prevent deployment conflicts
+- Requires proper permissions (`contents: read`, `pages: write`, `id-token: write`)
+
+### GitHub Pages Configuration
+
+To enable automatic deployment:
+
+1. Go to repository **Settings** > **Pages**
+2. Under **Build and deployment** > **Source**, select **GitHub Actions**
+3. The workflow will automatically deploy on the next push to `main`
+
+**Deployment URL**: https://sauce-base.github.io/docs/
+
+**Repository Settings:**
 - Organization: `sauce-base`
 - Project: `docs`
 - Branch: `main`
