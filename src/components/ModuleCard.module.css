@@ -1,0 +1,106 @@
+.moduleCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ifm-border-color);
+  background-color: var(--ifm-card-background-color);
+  padding: 1.5rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: var(--shadow-sm);
+}
+
+.moduleCard:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--ifm-color-primary-lighter);
+  transform: translateY(-4px);
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  background-color: var(--ifm-color-primary-lighter);
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ifm-color-primary-darker);
+}
+
+.icon {
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.title {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ifm-font-color-base);
+}
+
+.description {
+  margin-bottom: 1rem;
+  flex-grow: 1;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+.link:hover {
+  color: var(--ifm-color-primary-dark);
+  text-decoration: none;
+}
+
+.linkArrow {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.2s ease-in-out;
+}
+
+.moduleCard:hover .linkArrow {
+  transform: translateX(4px);
+}
+
+.disabled {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ifm-color-emphasis-500);
+}
+
+/* Dark mode adjustments */
+html[data-theme='dark'] .moduleCard {
+  background-color: var(--ifm-card-background-color);
+  border-color: var(--ifm-border-color);
+}
+
+html[data-theme='dark'] .moduleCard:hover {
+  border-color: var(--ifm-color-primary);
+}
+
+html[data-theme='dark'] .description {
+  color: var(--ifm-color-emphasis-600);
+}
+
+html[data-theme='dark'] .comingSoonBadge {
+  background-color: rgba(139, 92, 246, 0.2);
+  color: var(--ifm-color-primary-lightest);
+}
