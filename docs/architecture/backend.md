@@ -873,5 +873,5 @@ return new PostResource($post);
 ## Next Steps
 
 - [Frontend Architecture](/architecture/frontend) - Understand the Vue frontend
-- [Modular System](/architecture/modular-system) - Deep dive into modules
-- [Testing](/architecture/testing) - Testing strategies
+- [Modules](/fundamentals/modules) - Deep dive into the modular system
+- [Coding Standards](/development/coding-standards) - Best practices and conventions

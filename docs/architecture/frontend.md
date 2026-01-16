@@ -817,5 +817,4 @@ const sortedItems = computed(() => {
 ## Next Steps
 
 - [Backend Architecture](/architecture/backend) - Understand the Laravel backend
-- [Asset Pipeline](/architecture/asset-pipeline) - Deep dive into Vite build system
-- [Testing](/architecture/testing) - Frontend testing strategies
+- [Commands](/development/commands) - Build and development commands

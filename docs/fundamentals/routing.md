@@ -461,4 +461,4 @@ const flash = computed(() => page.props.flash);
 
 - [Translations](/fundamentals/translations) - Learn about multi-language support
 - [SSR](/fundamentals/ssr) - Understand server-side rendering
-- [Authentication](/fundamentals/authentication) - Implement authentication flows
+- [Modules](/fundamentals/modules) - Learn about the Auth module for authentication

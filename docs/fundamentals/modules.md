@@ -552,13 +552,13 @@ php artisan module:migrate-status Auth
 
 ## Creating Custom Modules
 
-Want to create your own module? See the [Creating Modules Guide](/advanced/creating-modules) for a step-by-step tutorial on building custom modules.
+Creating your own module follows the same structure as built-in modules. You can use the module generator or manually create the structure. Documentation for creating custom modules is coming soon.
 
 ## Next Steps
 
 - **[Routing](/fundamentals/routing)** - Learn about routing in Saucebase
 - **[SSR](/fundamentals/ssr)** - Server-side rendering per page
-- **[Creating Modules](/advanced/creating-modules)** - Build your own modules
+- **[Navigation](/fundamentals/navigation)** - Build navigation menus
 
 ---
 

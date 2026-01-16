@@ -293,7 +293,7 @@ server {
 }
 ```
 
-See the [Multi-Tenancy Guide](/advanced/multi-tenancy) for detailed setup.
+Multi-tenancy setup documentation is coming soon.
 
 ## Environment-Specific Configuration
 

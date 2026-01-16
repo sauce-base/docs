@@ -639,6 +639,6 @@ if (!isLoaded('my.key')) {
 
 ## Next Steps
 
-- [Theming](/fundamentals/theming) - Learn about styling and themes
+- [Dark & Light Mode](/fundamentals/theme-mode) - Learn about theme switching
 - [Routing](/fundamentals/routing) - Understand routing system
 - [SSR](/fundamentals/ssr) - Server-side rendering configuration

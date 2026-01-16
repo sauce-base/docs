@@ -417,11 +417,10 @@ graph LR
 
 Dive deeper into specific architectural components:
 
-- **[Modular System](/architecture/modular-system)** - How modules work
+- **[Modules](/fundamentals/modules)** - How the modular system works
 - **[Frontend Architecture](/architecture/frontend)** - Vue + Inertia details
 - **[Backend Architecture](/architecture/backend)** - Laravel patterns
-- **[Asset Pipeline](/architecture/asset-pipeline)** - Vite build process
-- **[Testing](/architecture/testing)** - PHPUnit + Playwright setup
+- **[Commands](/development/commands)** - Build and development commands
 
 ---
 

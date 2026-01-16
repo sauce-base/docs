@@ -437,7 +437,7 @@ The default-disabled approach is recommended to avoid accidentally enabling SSR 
 
 - **[Routing](/fundamentals/routing)** - Learn about routing with Ziggy
 - **[Modules](/fundamentals/modules)** - Module page resolution with namespace syntax
-- **[Theming](/fundamentals/theming)** - Dark mode and theme customization
+- **[Dark & Light Mode](/fundamentals/theme-mode)** - Theme customization and switching
 
 ---
 
