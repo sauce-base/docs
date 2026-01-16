@@ -719,6 +719,6 @@ php artisan migrate --force
 
 ## Next Steps
 
-- [Commands Reference](/development/commands) - All available commands
-- [Docker Services](/reference/docker-services) - Docker configuration
-- [Environment Variables](/reference/environment-variables) - Configuration reference
+- [Configuration](/getting-started/configuration) - Environment setup and configuration
+- [Commands](/development/commands) - All available development commands
+- [Glossary](/reference/glossary) - Technical terms and definitions

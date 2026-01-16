@@ -688,10 +688,8 @@ alias build="npm run build"
 
 ## Next Steps
 
-- **[Coding Standards](/development/coding-standards)** - Code quality guidelines
-- **[Git Workflow](/development/git-workflow)** - Commit conventions and hooks
-- **[Testing Guide](/development/testing-guide)** - Writing and running tests
-- **[Debugging](/development/debugging)** - Debugging tips and tools
+- **[Coding Standards](/development/coding-standards)** - Code quality guidelines and best practices
+- **[Git Workflow](/development/git-workflow)** - Branch strategy and commit conventions
 
 ---
 

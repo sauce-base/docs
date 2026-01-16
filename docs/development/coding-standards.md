@@ -747,5 +747,4 @@ Before requesting review, ensure:
 ## Next Steps
 
 - [Git Workflow](/development/git-workflow) - Learn about commit standards
-- [Testing Guide](/development/testing-guide) - Testing strategies
-- [Debugging](/development/debugging) - Debugging techniques
+- [Commands](/development/commands) - Development commands

@@ -528,6 +528,5 @@ git amend           # amend without editing message
 
 ## Next Steps
 
-- [Testing Guide](/development/testing-guide) - Learn about testing strategies
 - [Coding Standards](/development/coding-standards) - Understand code quality standards
-- [Debugging](/development/debugging) - Learn debugging techniques
+- [Commands](/development/commands) - Useful development commands

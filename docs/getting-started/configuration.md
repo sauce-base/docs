@@ -393,4 +393,4 @@ Then restart: `docker compose down && docker compose up -d`
 
 ---
 
-Need help? Check the [Environment Variables Reference](/reference/environment-variables) for a complete list.
+Need help? Check the [Troubleshooting](/reference/troubleshooting) guide for common configuration issues.
