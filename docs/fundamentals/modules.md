@@ -36,12 +36,53 @@ When you install a module, you're not depending on it—you're **acquiring** it.
 
 ## Available Modules
 
-| Module | Description | Repository |
-|--------|-------------|------------|
-| **Auth** | Authentication with social login support (Google, GitHub) | [sauce-base/auth](https://github.com/sauce-base/auth) |
-| **Settings** | User and system settings management | [sauce-base/settings](https://github.com/sauce-base/settings) |
+import ModuleGrid from '@site/src/components/ModuleGrid';
+import ModuleCard from '@site/src/components/ModuleCard';
 
-More modules coming soon!
+<ModuleGrid>
+  <ModuleCard
+    title="Auth"
+    description="Complete authentication system with social login support for Google and GitHub. Includes registration, login, password reset, and OAuth integration."
+    href="https://github.com/sauce-base/auth"
+    icon="🔐"
+    status="available"
+  />
+  <ModuleCard
+    title="Settings"
+    description="User and system settings management with a flexible configuration system. Manage user preferences and application-wide settings."
+    href="https://github.com/sauce-base/settings"
+    icon="⚙️"
+    status="available"
+  />
+  <ModuleCard
+    title="Billing"
+    description="Subscription and payment management with Stripe integration. Handle plans, invoices, and customer billing."
+    href="https://github.com/sauce-base/billing"
+    icon="💳"
+    status="coming-soon"
+  />
+  <ModuleCard
+    title="Teams"
+    description="Multi-tenant team management with role-based permissions. Collaborate with team members on shared resources."
+    href="https://github.com/sauce-base/teams"
+    icon="👥"
+    status="coming-soon"
+  />
+  <ModuleCard
+    title="Notifications"
+    description="Multi-channel notification system supporting email, SMS, and in-app notifications with queue support."
+    href="https://github.com/sauce-base/notifications"
+    icon="🔔"
+    status="coming-soon"
+  />
+  <ModuleCard
+    title="API"
+    description="RESTful API foundation with Laravel Sanctum authentication and API token management."
+    href="https://github.com/sauce-base/api"
+    icon="🔌"
+    status="coming-soon"
+  />
+</ModuleGrid>
 
 ## Installing Modules
 
