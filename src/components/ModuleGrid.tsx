@@ -1,17 +1,14 @@
 import React from 'react';
-import ModuleCard, { ModuleCardProps } from './ModuleCard';
 import styles from './ModuleGrid.module.css';
 
 export interface ModuleGridProps {
-  modules: ModuleCardProps[];
+  children: React.ReactNode;
 }
 
-export default function ModuleGrid({ modules }: ModuleGridProps): JSX.Element {
+export default function ModuleGrid({ children }: ModuleGridProps): JSX.Element {
   return (
     <div className={styles.moduleGrid}>
-      {modules.map((module, index) => (
-        <ModuleCard key={index} {...module} />
-      ))}
+      {children}
     </div>
   );
 }
