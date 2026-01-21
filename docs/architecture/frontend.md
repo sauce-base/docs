@@ -166,6 +166,86 @@ createServer((page) =>
 );
 ```
 
+## Inertia Integration
+
+Inertia.js is the bridge between Laravel and Vue, eliminating the need for a traditional REST API while maintaining a modern SPA experience.
+
+### How Inertia Eliminates APIs
+
+In traditional SPA architectures, you build separate frontend and backend applications:
+
+1. Backend exposes REST/GraphQL API endpoints
+2. Frontend makes HTTP requests to fetch data
+3. You maintain two parallel representations of your data structure
+4. API versioning, documentation, and authentication become complex
+
+Inertia simplifies this dramatically:
+
+1. **Controllers return props directly** - No API layer needed
+2. **Type-safe data flow** - Props are defined once, used everywhere
+3. **Automatic CSRF protection** - Built into Laravel
+4. **Session-based auth** - Use Laravel's authentication out of the box
+
+### Props Flow
+
+Data flows from Laravel controllers to Vue components as typed props:
+
+**Backend (Controller)**:
+```php
+return Inertia::render('Users/Index', [
+    'users' => User::with('roles')->paginate(10),
+    'filters' => $request->only(['search', 'role']),
+]);
+```
+
+**Frontend (Vue Component)**:
+```vue
+<script setup lang="ts">
+interface Props {
+    users: PaginatedData<User>;
+    filters: { search?: string; role?: string };
+}
+
+const props = defineProps<Props>();
+</script>
+```
+
+The props are **type-safe** - TypeScript validates that the component receives the expected data structure. Changes to the backend immediately show type errors in the frontend.
+
+### Type Safety from Controller to Component
+
+TypeScript provides end-to-end type safety:
+
+1. Define types in `resources/js/types/global.d.ts`
+2. Use types in Vue components with `defineProps<Props>()`
+3. Get autocomplete and type checking in your IDE
+4. Build-time validation catches mismatches
+
+This makes refactoring safe. Change a prop name in the controller, and TypeScript will flag every component that needs updating.
+
+### Benefits of This Approach
+
+**Simpler Architecture**: No API layer to build, document, or version. Controllers return data directly to pages.
+
+**Faster Development**: Build features faster without maintaining parallel backend/frontend data structures.
+
+**Better DX**: IDE autocomplete, type checking, and instant feedback on data structure changes.
+
+**Security Built-in**: CSRF protection, session authentication, and authorization work out of the box.
+
+**Less Code**: Eliminate API controllers, request/response transformers, and client-side HTTP logic.
+
+### When to Use Traditional APIs
+
+Inertia is ideal for web applications where the frontend and backend are tightly coupled. Use traditional REST/GraphQL APIs when:
+
+- Building a public API for third-party developers
+- Supporting mobile applications (iOS, Android)
+- Integrating with external systems
+- Need to support multiple frontend frameworks
+
+For these cases, Laravel's API resources and controllers work alongside Inertia pages.
+
 ## Module Page Resolution
 
 Saucebase extends Inertia to support modular architecture with **namespace syntax**.
@@ -216,6 +296,10 @@ return Inertia::render('Dashboard');
 return Inertia::render('Auth::Login');
 // Resolves to: modules/Auth/resources/js/pages/Login.vue
 ```
+
+This namespace syntax keeps module pages isolated while maintaining simple, readable controller code.
+
+**Learn more**: [Modules Guide](/fundamentals/modules) for practical usage examples.
 
 ## Module Lifecycle
 

@@ -1,0 +1,358 @@
+---
+sidebar_position: 2
+title: Module System
+description: How Saucebase's modular architecture works
+---
+
+# Module System Architecture
+
+Saucebase uses a modular architecture that allows features to be self-contained, independently developed, and optionally enabled. This guide explains how the module system works architecturally.
+
+## What Are Modules?
+
+Modules are **self-contained feature packages** that integrate seamlessly with the core application. Think of them like plugins, but owned by your project rather than maintained externally.
+
+Each module contains everything needed for its feature:
+- Backend code (controllers, models, services)
+- Frontend code (Vue pages and components)
+- Database migrations and seeders
+- Routes (web and API)
+- Translations
+- Tests
+
+When you install a module, the code is copied into your repository under `modules/<ModuleName>/`. From that point, it's your code to modify and maintain.
+
+## Module Architecture
+
+### Directory Structure
+
+Every module follows a standard structure that mirrors Laravel's organization:
+
+```
+modules/<ModuleName>/
+├── app/                           # Backend code
+│   ├── Http/
+│   │   ├── Controllers/          # HTTP controllers for this module
+│   │   ├── Middleware/           # Module-specific middleware
+│   │   └── Requests/             # Form validation requests
+│   ├── Models/                   # Eloquent models
+│   ├── Services/                 # Business logic
+│   ├── Events/                   # Module events
+│   ├── Listeners/                # Event listeners
+│   ├── Jobs/                     # Queue jobs
+│   ├── Policies/                 # Authorization policies
+│   └── Providers/
+│       └── <ModuleName>ServiceProvider.php
+│
+├── config/
+│   └── config.php                # Module configuration
+│
+├── database/
+│   ├── migrations/               # Database migrations
+│   ├── seeders/                  # Database seeders
+│   └── factories/                # Model factories
+│
+├── lang/                         # Translations
+│   ├── en/
+│   └── pt_BR/
+│
+├── resources/
+│   ├── js/                       # Frontend code
+│   │   ├── app.ts               # Module setup hooks (optional)
+│   │   ├── pages/               # Inertia pages
+│   │   └── components/          # Vue components
+│   └── css/                     # Styles
+│
+├── routes/
+│   ├── web.php                  # Web routes
+│   └── api.php                  # API routes
+│
+├── tests/
+│   ├── Feature/                 # Feature tests
+│   ├── Unit/                    # Unit tests
+│   └── e2e/                     # Playwright E2E tests
+│
+├── vite.config.js               # Asset entry points
+├── playwright.config.ts         # E2E test configuration (optional)
+└── module.json                  # Module metadata
+```
+
+This structure keeps modules organized and predictable. Developers familiar with Laravel immediately understand where to find code.
+
+### Module Metadata
+
+Each module has a `module.json` file describing its identity:
+
+```json
+{
+    "name": "Auth",
+    "alias": "auth",
+    "description": "Authentication with social login support",
+    "keywords": ["authentication", "oauth", "login"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Auth\\Providers\\AuthServiceProvider"
+    ],
+    "files": []
+}
+```
+
+The `providers` array tells Laravel which service provider to load when the module is enabled.
+
+## Module Lifecycle
+
+Understanding how modules are discovered, loaded, and integrated helps you understand the system's behavior.
+
+### 1. Installation
+
+When you run `composer require saucebase/auth`, Composer downloads the module and places it in `modules/Auth/`. At this point, the module exists but isn't active.
+
+### 2. Enable/Disable
+
+The `modules_statuses.json` file tracks which modules are enabled:
+
+```json
+{
+    "Auth": true,
+    "Settings": true,
+    "Analytics": false
+}
+```
+
+Only enabled modules are loaded by the application. This file is the source of truth for module activation.
+
+### 3. Discovery
+
+At application boot time, Laravel reads `modules_statuses.json` and loads service providers for enabled modules. This happens automatically—you don't need to register providers manually.
+
+During the build process, `module-loader.js` scans the same file to determine which module assets to include in the frontend bundle.
+
+### 4. Registration
+
+Each module's service provider registers its components:
+- Routes are loaded from `routes/web.php` and `routes/api.php`
+- Migrations are discovered from `database/migrations/`
+- Translations are loaded from `lang/`
+- Configuration is registered from `config/`
+- Assets are collected from `vite.config.js`
+
+### 5. Boot
+
+After registration, service providers boot. This is where modules can:
+- Share data with Inertia (global props available in all pages)
+- Set up event listeners
+- Extend framework classes
+- Initialize third-party integrations
+
+### 6. Runtime
+
+Once booted, modules behave like any other part of the application. Their routes respond to requests, their models interact with the database, and their pages render in the frontend.
+
+## Module Integration Points
+
+Modules integrate with the core application through well-defined touch points.
+
+### Service Provider Pattern
+
+Every module extends `App\Providers\ModuleServiceProvider`, which handles common module concerns:
+
+- **Translation loading**: Automatically loads language files from `lang/`
+- **Config registration**: Merges module config with application config
+- **Migration discovery**: Makes migrations available to Laravel
+- **Inertia data sharing**: Shares module config with the frontend
+
+The base service provider eliminates boilerplate, so module authors can focus on module-specific setup.
+
+### Route Registration
+
+Module routes are automatically loaded based on convention:
+- `routes/web.php` → Web routes (sessions, CSRF protection)
+- `routes/api.php` → API routes (stateless, token auth)
+
+Routes are prefixed with the module name by default, preventing collisions. The Auth module's routes live under `/auth/*`, Settings under `/settings/*`, etc.
+
+### Asset Discovery
+
+At build time, `module-loader.js` discovers module assets:
+
+1. Reads `modules_statuses.json` for enabled modules
+2. Finds each module's `vite.config.js`
+3. Extracts the `paths` array from each config
+4. Adds those paths to Vite's input
+
+This means modules automatically participate in the build process when enabled, and are excluded when disabled.
+
+### Page Resolution
+
+Frontend page resolution works through namespace syntax:
+
+- `Auth::Login` → `modules/Auth/resources/js/pages/Login.vue`
+- `Dashboard` → `resources/js/pages/Dashboard.vue`
+
+The `resolveModularPageComponent()` function checks for the `::` separator and resolves paths accordingly. This keeps module pages isolated while maintaining a simple, readable syntax.
+
+### Database Integration
+
+Modules share the same database as the core application. When migrations run, module migrations execute alongside core migrations. This creates a unified database schema.
+
+Module models can reference core models (like `User`) and vice versa. There's no enforced isolation—modules are part of your application, not separate microservices.
+
+## Module Isolation vs Sharing
+
+Modules strike a balance between isolation and integration.
+
+### What's Isolated
+
+**Routes**: Module routes are discovered separately, preventing accidental overrides. Each module controls its own URL space.
+
+**Migrations**: Module migrations live in the module directory. Rolling back or refreshing migrations can be done per-module.
+
+**Assets**: Module JavaScript and CSS are separate files during development. Vite can hot-reload module code independently.
+
+**Tests**: Module tests are in `modules/<Name>/tests/`. You can run tests for a single module without running the entire test suite.
+
+**Translations**: Module translations don't conflict with core or other module translations. Each module has its own namespace.
+
+### What's Shared
+
+**Database**: All modules use the same database. Tables from different modules can have foreign key relationships.
+
+**Cache**: Redis cache is shared. Modules should prefix cache keys to avoid collisions.
+
+**Queue**: Background jobs from all modules use the same queue system.
+
+**Authentication**: Modules use the core application's authentication system. The `User` model is shared.
+
+**Configuration**: While modules can have their own config files, they're merged into the global config array.
+
+This design reflects Saucebase's philosophy: modules are organizational units, not separate applications. They're tightly integrated where it makes sense (database, auth) and loosely coupled where it doesn't (routes, assets).
+
+## Module Auto-Discovery
+
+Auto-discovery makes modules "just work" without manual configuration.
+
+### Backend Discovery
+
+Laravel's module system automatically:
+- Detects enabled modules from `modules_statuses.json`
+- Loads their service providers
+- Registers their routes
+- Discovers their migrations
+- Loads their translations
+
+You install a module, enable it, and it's immediately available. No config files to edit, no providers to register manually.
+
+### Frontend Discovery
+
+The build system automatically:
+- Discovers module entry points from `vite.config.js` files
+- Includes enabled module assets in the build
+- Excludes disabled module assets
+- Discovers module pages for Inertia resolution
+- Collects module translations for the i18n plugin
+- Finds module Playwright configs for E2E testing
+
+This auto-discovery extends to development tooling. When you run `npm run dev`, enabled modules get hot module replacement. When you run tests, module tests are included.
+
+### How It Works
+
+The `module-loader.js` file provides discovery functions:
+
+**`getEnabledModules()`**: Reads `modules_statuses.json` and returns enabled module names.
+
+**`collectModuleAssetsPaths()`**: Finds all enabled modules, reads their `vite.config.js`, and extracts asset paths.
+
+**`collectModuleLangPaths()`**: Gathers translation directories from enabled modules.
+
+**`collectModulePlaywrightConfigs()`**: Discovers E2E test configurations.
+
+These functions are called during Vite configuration and Playwright setup, automatically adapting the build system to enabled modules.
+
+## Module Communication
+
+Modules can communicate with each other and the core application through Laravel's built-in patterns.
+
+### Events
+
+Modules can dispatch events that other modules (or the core app) listen to. This creates loose coupling—modules don't need to know about each other directly.
+
+Example: The Auth module dispatches a `UserLoggedIn` event. An Analytics module listens to that event and tracks the login. Neither module needs to know about the other's implementation.
+
+### Service Container
+
+Modules can register services in Laravel's container that other modules can inject. This is useful for sharing functionality without tight coupling.
+
+### Shared Data
+
+Modules can share data with the frontend through Inertia. The base `ModuleServiceProvider` makes module config available to all Vue components.
+
+### Database Relationships
+
+Module models can reference each other through Eloquent relationships. An Order module might reference the User model from the Auth module.
+
+This communication happens through Laravel's standard patterns. Modules aren't isolated applications—they're part of the same Laravel app, with all the tools Laravel provides.
+
+## Development Workflow
+
+Understanding the module lifecycle helps you work efficiently.
+
+### Adding a Module
+
+1. Install via Composer: `composer require saucebase/module-name`
+2. Enable: `php artisan module:enable ModuleName`
+3. Run migrations: `php artisan module:migrate ModuleName`
+4. Rebuild frontend: `npm run build` (or restart `npm run dev`)
+
+The module is now active and integrated.
+
+### Customizing a Module
+
+Since module code is in your repository, customization is straightforward:
+
+1. Open the module file you want to change
+2. Edit it like any other file in your project
+3. Test your changes
+4. Commit to version control
+
+No forking, no pull requests, no package management complexity.
+
+### Disabling a Module
+
+1. Disable: `php artisan module:disable ModuleName`
+2. Rebuild frontend: `npm run build`
+
+The module's code remains in place, but it's not loaded or executed. You can re-enable it later without reinstalling.
+
+### Removing a Module
+
+If you're certain you won't use a module:
+
+1. Disable it
+2. Roll back its migrations: `php artisan module:migrate-rollback ModuleName`
+3. Delete the module directory: `rm -rf modules/ModuleName/`
+4. Remove from `composer.json` and run `composer update`
+
+## Benefits of the Module System
+
+**Organizational Clarity**: Related code stays together. Everything for authentication is in the Auth module, nothing else.
+
+**Independent Development**: Teams can work on different modules without stepping on each other's toes.
+
+**Testability**: Test one module in isolation without booting the entire application.
+
+**Flexibility**: Enable features you need, disable features you don't. No bloat from unused code.
+
+**Copy-and-Own**: Modules are your code. Customize freely without fighting framework abstractions.
+
+**Discoverability**: New developers can explore modules to understand features without hunting through a monolithic structure.
+
+## Next Steps
+
+Now that you understand how modules work architecturally:
+
+- **[Modules Guide](/fundamentals/modules)** - Learn how to use modules in practice
+- **[Philosophy](/architecture/philosophy)** - Understand the principles behind the architecture
+- **[Frontend Architecture](/architecture/frontend)** - See how module pages integrate with Vue
+- **[Backend Architecture](/architecture/backend)** - Understand module service providers in depth
+
+The module system is a key part of what makes Saucebase maintainable as your application grows. Use it to keep your codebase organized and understandable.

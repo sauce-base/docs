@@ -1,5 +1,6 @@
 ---
 sidebar_position: 2
+slug: /
 title: Installation
 description: Complete installation guide for Saucebase - quick start and manual installation options
 ---
@@ -13,6 +14,11 @@ Get Saucebase up and running in minutes with the automated installer, or follow 
 Before installing Saucebase, ensure you have:
 
 ### Required
+
+- **Composer** (2.0.0+)
+  - [Download from getcomposer.org](https://getcomposer.org/download/)
+  - Or use Homebrew (macOS/Linux): `brew install composer`
+  - Or use the installer script (Linux/macOS): Check [installation guide](https://getcomposer.org/doc/00-intro.md#installation-linux-unix-macos)
 
 - **Docker Desktop** (20.0.0+)
   - [Download for Mac](https://docs.docker.com/desktop/install/mac-install/)

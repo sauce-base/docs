@@ -16,14 +16,13 @@ const sidebars: SidebarsConfig = {
     {
       type: 'doc',
       id: 'index',
-      label: '🏠  Welcome',
+      label: 'Welcome',
     },
     {
       type: 'category',
-      label: '🚀  Getting Started',
+      label: 'Getting Started',
       collapsed: false,
       items: [
-        'getting-started/introduction',
         'getting-started/installation',
         'getting-started/configuration',
         'getting-started/directory-structure',
@@ -31,20 +30,21 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: '🏗️  Architecture',
+      label: 'Architecture',
       collapsed: true,
       items: [
+        'architecture/philosophy',
+        'architecture/module-system',
         'architecture/overview',
         'architecture/frontend',
         'architecture/backend',
-        // 'architecture/modular-system',
         // 'architecture/asset-pipeline',
         // 'architecture/testing',
       ],
     },
     {
       type: 'category',
-      label: '✨  Features',
+      label: 'Features',
       collapsed: true,
       items: [
         'fundamentals/modules',
@@ -59,19 +59,19 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: 'category',
-      label: '💻  Development',
+      label: 'Development',
       collapsed: true,
       items: [
         'development/commands',
         'development/git-workflow',
         'development/coding-standards',
-        // 'development/testing-guide',
+        'development/testing-guide',
         // 'development/debugging',
       ],
     },
     // {
     //   type: 'category',
-    //   label: '🚀  Advanced',
+    //   label: 'Advanced',
     //   collapsed: true,
     //   items: [
     //     'advanced/creating-modules',
@@ -83,7 +83,7 @@ const sidebars: SidebarsConfig = {
     // },
     {
       type: 'category',
-      label: '📚  Reference',
+      label: 'Reference',
       collapsed: true,
       items: [
         'reference/troubleshooting',

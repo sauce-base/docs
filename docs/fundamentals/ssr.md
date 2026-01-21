@@ -433,11 +433,33 @@ return Inertia::render('Dashboard')->withoutSSR();  // Opt-out
 The default-disabled approach is recommended to avoid accidentally enabling SSR for authenticated pages.
 :::
 
+## Technical Implementation
+
+### Entry Point Files
+
+Saucebase uses two separate entry points for SSR:
+
+- **`resources/js/app.ts`** - Client-side rendering entry point
+- **`resources/js/ssr.ts`** - Server-side rendering entry point
+
+Both files initialize the Vue app with Inertia.js, but the SSR entry point includes server-specific configuration.
+
+### Macro Registration
+
+The `->withSSR()` and `->withoutSSR()` macros are registered in:
+
+**`app/Providers/MacroServiceProvider.php`**
+
+This provider centralizes all framework macro extensions, making them easy to discover and maintain.
+
+See the [Directory Structure](/getting-started/directory-structure#unique-saucebase-files) page for more details on Saucebase-specific files.
+
 ## Next Steps
 
 - **[Routing](/fundamentals/routing)** - Learn about routing with Ziggy
 - **[Modules](/fundamentals/modules)** - Module page resolution with namespace syntax
 - **[Dark & Light Mode](/fundamentals/theme-mode)** - Theme customization and switching
+- **[Testing Guide](/development/testing-guide)** - Test SSR with Playwright helpers
 
 ---
 

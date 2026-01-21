@@ -7,6 +7,35 @@ const config: Config = {
   tagline: 'Modular Laravel SaaS Starter Kit',
   favicon: 'img/favicon.ico',
 
+  headTags: [
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: '/docs/img/favicon-32x32.png',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: '/docs/img/favicon-16x16.png',
+      },
+    },
+    {
+      tagName: 'link',
+      attributes: {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: '/docs/img/apple-touch-icon.png',
+      },
+    },
+  ],
+
   // Set the production url of your site here
   url: 'https://sauce-base.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
@@ -91,11 +120,6 @@ const config: Config = {
         },
         {
           href: 'https://github.com/sauce-base/saucebase',
-          label: 'Main Repo',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/sauce-base/docs',
           label: 'GitHub',
           position: 'right',
         },
@@ -109,7 +133,7 @@ const config: Config = {
           items: [
             {
               label: 'Getting Started',
-              to: '/getting-started/introduction',
+              to: '/',
             },
             {
               label: 'Architecture',
