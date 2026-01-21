@@ -1,329 +1,449 @@
 ---
-sidebar_position: 5
+sidebar_position: 4
 title: Navigation
-description: Learn how to implement navigation menus and links in your Saucebase application using Inertia.js and Vue Router
+description: Learn how to implement navigation in Saucebase using Inertia.js and the Navigation service
 ---
 
 # Navigation
 
-Navigation in Saucebase is powered by Inertia.js, which provides seamless client-side transitions without full page reloads. You can build dynamic navigation menus with active states, nested routes, and programmatic navigation.
+Saucebase provides two complementary approaches to navigation:
 
-## Why Use Inertia Navigation?
+1. **Frontend Navigation** - Static links using Inertia's Link component
+2. **Backend Navigation System** - Dynamic, file-based menu registration with automatic frontend sharing
 
-- **Fast**: Client-side navigation without full page reloads
-- **SEO-friendly**: Works with standard anchor tags and browser history
-- **Simple**: No need to configure Vue Router - Inertia handles routing automatically
-- **Type-safe**: Use Ziggy to generate type-safe route helpers from your Laravel routes
+## Frontend Navigation
 
-## Basic Navigation
+For simple static navigation, use Inertia's Link component with Ziggy route helpers:
 
-### Using Inertia Link Component
-
-The `Link` component from Inertia.js is the primary way to navigate between pages:
-
-```vue title="resources/js/Components/Navigation/AppNav.vue"
-<script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-</script>
-
-<template>
-  <nav>
-    <Link href="/dashboard">
-      Dashboard
-    </Link>
-
-    <Link href="/profile">
-      Profile
-    </Link>
-
-    <Link href="/settings">
-      Settings
-    </Link>
-  </nav>
-</template>
-```
-
-### Using Ziggy for Type-Safe Routes
-
-Ziggy generates JavaScript route helpers from your Laravel routes. Use the `route()` helper for type-safe navigation:
-
-```vue title="resources/js/Components/Navigation/AppNav.vue"
+```vue title="resources/js/Components/Navigation/SimpleNav.vue"
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { route } from 'ziggy-js';
-</script>
-
-<template>
-  <nav>
-    <Link :href="route('dashboard')">
-      Dashboard
-    </Link>
-
-    <Link :href="route('profile.show')">
-      Profile
-    </Link>
-
-    <Link :href="route('settings.index')">
-      Settings
-    </Link>
-  </nav>
-</template>
-```
-
-:::tip Type Safety
-Ziggy provides full TypeScript support for your Laravel routes. Install the types with `npm install -D ziggy-js` and configure in your `tsconfig.json`.
-:::
-
-## Active Link States
-
-You can highlight the current page by checking the active route:
-
-```vue title="resources/js/Components/Navigation/NavLink.vue"
-<script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-
-interface Props {
-  href: string;
-  active?: boolean;
-}
-
-const props = defineProps<Props>();
-
-const page = usePage();
-
-const isActive = computed(() => {
-  return props.active ?? page.url.startsWith(props.href);
-});
-</script>
-
-<template>
-  <Link
-    :href="href"
-    :class="{
-      'bg-purple-100 text-purple-700': isActive,
-      'text-gray-600 hover:bg-gray-100': !isActive,
-    }"
-    class="px-4 py-2 rounded-lg transition"
-  >
-    <slot />
-  </Link>
-</template>
-```
-
-**Usage:**
-
-```vue
-<NavLink href="/dashboard">
-  Dashboard
-</NavLink>
-
-<NavLink href="/profile" :active="route().current('profile.*')">
-  Profile
-</NavLink>
-```
-
-## Nested Navigation
-
-Create hierarchical navigation with dropdown menus:
-
-```vue title="resources/js/Components/Navigation/DropdownNav.vue"
-<script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { ref } from 'vue';
-
-const isOpen = ref(false);
-</script>
-
-<template>
-  <div class="relative">
-    <button
-      @click="isOpen = !isOpen"
-      class="px-4 py-2 rounded-lg hover:bg-gray-100"
-    >
-      Settings
-      <svg class="w-4 h-4 inline ml-2" fill="currentColor" viewBox="0 0 20 20">
-        <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
-      </svg>
-    </button>
-
-    <div
-      v-if="isOpen"
-      class="absolute top-full mt-2 w-48 bg-white rounded-lg shadow-lg border"
-    >
-      <Link
-        :href="route('settings.profile')"
-        class="block px-4 py-2 hover:bg-gray-100"
-      >
-        Profile Settings
-      </Link>
-
-      <Link
-        :href="route('settings.security')"
-        class="block px-4 py-2 hover:bg-gray-100"
-      >
-        Security
-      </Link>
-
-      <Link
-        :href="route('settings.billing')"
-        class="block px-4 py-2 hover:bg-gray-100"
-      >
-        Billing
-      </Link>
-    </div>
-  </div>
-</template>
-```
-
-## Programmatic Navigation
-
-Navigate programmatically using the Inertia router:
-
-```vue title="resources/js/Pages/Dashboard.vue"
-<script setup lang="ts">
-import { router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-
-function goToProfile() {
-  router.visit(route('profile.show'));
-}
-
-function goBack() {
-  router.visit(window.history.back());
-}
-
-function redirectToSettings() {
-  router.visit(route('settings.index'), {
-    replace: true, // Replace current history entry
-  });
-}
-</script>
-
-<template>
-  <div>
-    <button @click="goToProfile">
-      View Profile
-    </button>
-
-    <button @click="goBack">
-      Go Back
-    </button>
-  </div>
-</template>
-```
-
-## Navigation with Data
-
-Pass data to the next page during navigation:
-
-```vue
-<script setup lang="ts">
-import { router } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-
-function editUser(userId: number) {
-  router.visit(route('users.edit', userId), {
-    data: {
-      from: 'dashboard'
-    }
-  });
-}
-</script>
-```
-
-## Preserving Scroll Position
-
-Preserve scroll position when navigating:
-
-```vue
-<script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-</script>
-
-<template>
-  <Link
-    :href="route('posts.show', post.id)"
-    preserve-scroll
-  >
-    Read More
-  </Link>
-</template>
-```
-
-## External Links
-
-For external links, use regular anchor tags:
-
-```vue
-<template>
-  <nav>
-    <!-- Internal navigation with Inertia -->
-    <Link :href="route('dashboard')">
-      Dashboard
-    </Link>
-
-    <!-- External link -->
-    <a
-      href="https://laravel.com/docs"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      Laravel Docs
-    </a>
-  </nav>
-</template>
-```
-
-:::warning External Links
-Always use regular `<a>` tags for external links. Inertia `Link` components are only for internal navigation within your application.
-:::
-
-## Complete Navigation Component
-
-Here's a full example of a navigation component with all features:
-
-```vue title="resources/js/Components/Navigation/AppNavigation.vue"
-<script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { route } from 'ziggy-js';
-import { computed } from 'vue';
-
-const page = usePage();
-
-const navigation = [
-  { name: 'Dashboard', href: route('dashboard'), pattern: 'dashboard' },
-  { name: 'Projects', href: route('projects.index'), pattern: 'projects.*' },
-  { name: 'Team', href: route('team.index'), pattern: 'team.*' },
-  { name: 'Settings', href: route('settings.index'), pattern: 'settings.*' },
-];
-
-function isActive(pattern: string) {
-  return route().current(pattern);
-}
 </script>
 
 <template>
   <nav class="flex gap-4">
     <Link
-      v-for="item in navigation"
-      :key="item.name"
-      :href="item.href"
-      :class="{
-        'bg-purple-100 text-purple-700 font-semibold': isActive(item.pattern),
-        'text-gray-600 hover:bg-gray-100 hover:text-gray-900': !isActive(item.pattern),
-      }"
-      class="px-4 py-2 rounded-lg transition"
+      :href="route('dashboard')"
+      class="px-4 py-2 text-gray-600 hover:text-gray-900"
     >
-      {{ item.name }}
+      Dashboard
     </Link>
+
+    <Link
+      :href="route('profile.show')"
+      class="px-4 py-2 text-gray-600 hover:text-gray-900"
+    >
+      Profile
+    </Link>
+
+    <a
+      href="https://docs.example.com"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="px-4 py-2 text-gray-600 hover:text-gray-900"
+    >
+      Documentation
+    </a>
   </nav>
 </template>
 ```
 
+**Key points:**
+- Use `Link` component for internal navigation
+- Use Ziggy's `route()` helper for type-safe Laravel routes
+- Use regular `<a>` tags for external links
+- Inertia automatically handles client-side navigation without page reloads
+
+---
+
+## Backend Navigation System
+
+For dynamic menus that need to be shared across your application, Saucebase provides a file-based Navigation system that automatically loads and shares navigation items with your frontend.
+
+### Overview
+
+The Navigation Service extends [Spatie Navigation](https://github.com/spatie/laravel-navigation) with:
+
+- **File-based registration** - Define navigation in `routes/navigation.php`
+- **Module-aware loading** - Automatically loads navigation from enabled modules
+- **Runtime conditions** - Show/hide items based on user permissions
+- **Grouped navigation** - Organize items (main, secondary, user, settings)
+- **Automatic frontend sharing** - Available in Vue via Inertia props
+
+### Quick Start
+
+Create navigation items in `routes/navigation.php`:
+
+```php title="routes/navigation.php"
+use Spatie\Navigation\Facades\Navigation;
+use Spatie\Navigation\Section;
+
+Navigation::add('Dashboard', route('dashboard'), function (Section $section) {
+    $section->attributes([
+        'group' => 'main',
+        'slug' => 'dashboard',
+        'order' => 0,
+    ]);
+});
+```
+
+### Navigation Attributes
+
+Configure navigation items using the `attributes()` method:
+
+| Attribute  | Type   | Description                                      |
+| ---------- | ------ | ------------------------------------------------ |
+| `group`    | string | Navigation group (main, secondary, user, etc.)   |
+| `slug`     | string | Unique identifier                                 |
+| `order`    | int    | Sort order (lower = higher priority)              |
+| `action`   | string | JavaScript action (e.g., 'logout')                |
+| `external` | bool   | External link flag                                |
+| `newPage`  | bool   | Open in new tab                                   |
+| `class`    | string | Custom CSS classes                                |
+| `badge`    | array  | Badge: `['content' => '1', 'variant' => 'destructive']` |
+
+**Examples:**
+
+```php title="routes/navigation.php"
+// External link
+Navigation::add('GitHub', 'https://github.com/username/repo', function (Section $section) {
+    $section->attributes([
+        'group' => 'secondary',
+        'slug' => 'github',
+        'external' => true,
+        'newPage' => true,
+        'order' => 0,
+    ]);
+});
+
+// With badge
+Navigation::add('Settings', route('settings.index'), function (Section $section) {
+    $section->attributes([
+        'group' => 'secondary',
+        'slug' => 'settings',
+        'order' => 10,
+        'badge' => [
+            'content' => '1',
+            'variant' => 'destructive',
+        ],
+    ]);
+});
+
+// Action-based (no URL navigation)
+Navigation::add('Log out', '#', function (Section $section) {
+    $section->attributes([
+        'group' => 'user',
+        'action' => 'logout',
+        'slug' => 'logout',
+        'order' => 100,
+    ]);
+});
+
+// With custom styling
+Navigation::add('Admin', route('filament.admin.pages.dashboard'), function (Section $section) {
+    $section->attributes([
+        'group' => 'secondary',
+        'slug' => 'admin',
+        'order' => 10,
+        'external' => true,
+        'newPage' => true,
+        'class' => 'bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20',
+    ]);
+});
+```
+
+### Runtime Conditions
+
+Use `addWhen()` to show items conditionally based on runtime state:
+
+```php title="routes/navigation.php"
+use Illuminate\Support\Facades\Auth;
+
+Navigation::addWhen(
+    fn () => Auth::check() && Auth::user()->isAdmin(),
+    'Admin',
+    route('filament.admin.pages.dashboard'),
+    function (Section $section) {
+        $section->attributes([
+            'group' => 'secondary',
+            'slug' => 'admin',
+            'order' => 10,
+        ]);
+    }
+);
+```
+
+The condition is evaluated at render time, allowing dynamic visibility based on:
+- User permissions
+- Session data
+- Feature flags
+- Database state
+
+### Module Navigation
+
+Modules can register navigation by creating `routes/navigation.php`:
+
+```php title="modules/Auth/routes/navigation.php"
+use Spatie\Navigation\Facades\Navigation;
+use Spatie\Navigation\Section;
+
+Navigation::add('Log out', '#', function (Section $section) {
+    $section->attributes([
+        'group' => 'user',
+        'action' => 'logout',
+        'slug' => 'logout',
+        'order' => 100,
+    ]);
+});
+```
+
+**Example from Settings module:**
+
+```php title="modules/Settings/routes/navigation.php"
+// User menu
+Navigation::add('Settings', route('settings.index'), function (Section $section) {
+    $section->attributes([
+        'group' => 'user',
+        'slug' => 'settings',
+        'order' => 10,
+    ]);
+});
+
+// Settings sidebar
+Navigation::add('General', route('settings.index'), function (Section $section) {
+    $section->attributes([
+        'group' => 'settings',
+        'slug' => 'general',
+        'order' => 10,
+    ]);
+});
+
+Navigation::add('Profile', route('settings.profile'), function (Section $section) {
+    $section->attributes([
+        'group' => 'settings',
+        'slug' => 'profile',
+        'order' => 20,
+    ]);
+});
+```
+
+Navigation is automatically loaded when the module is enabled in `modules_statuses.json`.
+
+### Frontend Integration
+
+Navigation is automatically shared with Vue via Inertia props. Access it in any component:
+
+```vue
+<script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const navigation = page.props.navigation;
+
+// Access specific groups
+const mainNav = navigation.main;
+const secondaryNav = navigation.secondary;
+const userNav = navigation.user;
+</script>
+
+<template>
+  <nav>
+    <!-- Main navigation -->
+    <div v-for="item in mainNav" :key="item.slug">
+      <Link
+        :href="item.url"
+        :class="{ 'active': item.active, [item.class]: item.class }"
+      >
+        {{ item.title }}
+        <span v-if="item.badge" class="badge">
+          {{ item.badge.content }}
+        </span>
+      </Link>
+    </div>
+  </nav>
+</template>
+```
+
+#### MenuItem Structure
+
+Each navigation item has the following structure:
+
+```typescript
+interface MenuItem {
+  title: string;           // Display text
+  url: string | null;      // Link URL
+  active: boolean;         // Current page match
+  slug: string;            // Unique identifier
+  action?: string;         // JavaScript action
+  external?: boolean;      // External link flag
+  newPage?: boolean;       // Open in new tab
+  class?: string;          // Custom CSS classes
+  badge?: {
+    content: string;
+    variant: string;
+  };
+  children?: MenuItem[];   // Nested items
+}
+```
+
+### How the System Works
+
+The Navigation system follows this flow:
+
+#### 1. Registration
+
+**NavigationServiceProvider** registers the custom Navigation service and automatically calls `load()`:
+
+```php title="app/Providers/NavigationServiceProvider.php"
+public function register(): void
+{
+    // Override Spatie's binding with custom Navigation class
+    $this->app->scoped(\Spatie\Navigation\Navigation::class, function ($app) {
+        return new Navigation($app->make(ActiveUrlChecker::class));
+    });
+
+    // Automatically load navigation files when resolved
+    $this->app->resolving(Navigation::class, function (Navigation $navigation) {
+        return $navigation->load();
+    });
+}
+```
+
+#### 2. File Discovery
+
+The `load()` method automatically discovers and loads navigation files:
+
+```php title="app/Services/Navigation.php (excerpt)"
+public function load(): self
+{
+    // Load core navigation
+    $coreNavigationPath = base_path('routes/navigation.php');
+    if (file_exists($coreNavigationPath)) {
+        require $coreNavigationPath;
+    }
+
+    // Load module navigation from enabled modules
+    $modulesStatusPath = base_path('modules_statuses.json');
+    if (file_exists($modulesStatusPath)) {
+        $modulesStatus = json_decode(file_get_contents($modulesStatusPath), true);
+
+        foreach ($modulesStatus as $moduleName => $enabled) {
+            if ($enabled) {
+                $moduleNavigationPath = base_path("modules/{$moduleName}/routes/navigation.php");
+                if (file_exists($moduleNavigationPath)) {
+                    require $moduleNavigationPath;
+                }
+            }
+        }
+    }
+
+    return $this;
+}
+```
+
+**Key behaviors:**
+- Checks `modules_statuses.json` to determine which modules are enabled
+- Only loads navigation files from enabled modules
+- No event listeners or manual registration needed
+- Files are loaded once when the Navigation service is first resolved
+
+#### 3. Transformation & Grouping
+
+**HandleInertiaRequests** middleware calls `treeGrouped()` to process navigation:
+
+```php title="app/Http/Middleware/HandleInertiaRequests.php (excerpt)"
+public function share(Request $request): array
+{
+    return array_merge(parent::share($request), [
+        'navigation' => app(Navigation::class)->treeGrouped(),
+        // ... other shared data
+    ]);
+}
+```
+
+The `treeGrouped()` method:
+1. Groups items by their `group` attribute
+2. Filters items based on `when` callables (runtime conditions)
+3. Transforms to MenuItem format (removes internal attributes)
+4. Calculates active state by comparing URLs
+5. Sorts by `order` attribute within each group
+
+#### 4. Frontend Access
+
+Vue components receive navigation via Inertia props:
+
+```vue
+<script setup lang="ts">
+const navigation = usePage().props.navigation;
+// navigation = {
+//   main: [...MenuItem[]],
+//   secondary: [...MenuItem[]],
+//   user: [...MenuItem[]],
+//   settings: [...MenuItem[]],
+// }
+</script>
+```
+
+### Complete Example
+
+Here's a full `routes/navigation.php` demonstrating various features:
+
+```php title="routes/navigation.php"
+use Illuminate\Support\Facades\Auth;
+use Spatie\Navigation\Facades\Navigation;
+use Spatie\Navigation\Section;
+
+// Main navigation
+Navigation::add('Dashboard', route('dashboard'), function (Section $section) {
+    $section->attributes([
+        'group' => 'main',
+        'slug' => 'dashboard',
+        'order' => 0,
+    ]);
+});
+
+// Secondary navigation - External links
+Navigation::add('Star us on Github', 'https://github.com/sauce-base/saucebase', function (Section $section) {
+    $section->attributes([
+        'group' => 'secondary',
+        'slug' => 'github',
+        'external' => true,
+        'newPage' => true,
+        'order' => 0,
+    ]);
+});
+
+Navigation::add('Documentation', 'https://sauce-base.github.io/docs', function (Section $section) {
+    $section->attributes([
+        'group' => 'secondary',
+        'slug' => 'documentation',
+        'external' => true,
+        'newPage' => true,
+        'order' => 10,
+    ]);
+});
+
+// Conditional navigation - Admin only
+Navigation::addWhen(
+    fn () => Auth::check() && Auth::user()->isAdmin(),
+    'Admin',
+    route('filament.admin.pages.dashboard'),
+    function (Section $section) {
+        $section->attributes([
+            'group' => 'secondary',
+            'slug' => 'admin',
+            'order' => 20,
+            'external' => true,
+            'newPage' => true,
+            'class' => 'bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500/20 hover:text-yellow-400',
+        ]);
+    }
+);
+```
+
 ## What's Next?
 
-- Learn about [Breadcrumbs](/fundamentals/breadcrumbs) for hierarchical navigation
-- Explore [Routing](/fundamentals/routing) to understand Laravel route configuration
-- Read about [SSR](/fundamentals/ssr) for server-side rendered navigation
+- [Breadcrumbs](./breadcrumbs.md) - Implement breadcrumb trails for hierarchical navigation
+- [Modules](./modules.md) - Learn about creating and managing modules
+- [Routing](./routing.md) - Understand Laravel and Inertia routing patterns
