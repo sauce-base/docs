@@ -559,6 +559,39 @@ When the main Saucebase repository changes affect documentation:
 3. Update affected pages
 4. Verify code examples still work
 
+### Directory Structure Page Guidelines
+
+The directory structure page (`getting-started/directory-structure.md`) should focus ONLY on:
+- **File and folder layout** - Where things are located
+- **Brief one-liner descriptions** - What each unique file does
+- **Links to detailed guides** - Point to architecture/feature pages
+
+**DO NOT include:**
+- Detailed architectural explanations (belongs in `/architecture/`)
+- Code examples (belongs in feature-specific pages)
+- Implementation details (belongs in feature guides)
+- Testing patterns (belongs in `/development/testing-guide`)
+- SSR architecture (belongs in `/fundamentals/ssr`)
+
+**Example format:**
+```markdown
+### Unique Files
+- `module-loader.js` - Discovers enabled modules at build time [→ Details](/architecture/overview)
+- `modules_statuses.json` - Tracks enabled/disabled modules
+```
+
+**Keep it scannable:**
+- Target length: 100-150 lines
+- Use visual trees for structure
+- One paragraph max per concept
+- Always link to detailed guides
+
+**Separation of concerns:**
+- Structure = Directory Structure page
+- Architecture = Architecture pages
+- Features = Feature-specific pages
+- Testing = Testing Guide page
+
 ## Related Repositories
 
 - **Main Repository**: [sauce-base/saucebase](https://github.com/sauce-base/saucebase) - The Laravel SaaS starter kit

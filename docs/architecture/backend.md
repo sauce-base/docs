@@ -206,7 +206,23 @@ abstract class ModuleServiceProvider extends ServiceProvider
 }
 ```
 
-### Module Service Provider Example
+### Module Service Providers
+
+Every module must have a service provider that extends `App\Providers\ModuleServiceProvider`. This base class handles common module concerns automatically.
+
+#### How Module Providers Work
+
+**Automatic Registration**: When a module is enabled in `modules_statuses.json`, Laravel automatically loads and registers its service provider. You don't need to add it to `config/app.php`.
+
+**Base Class Benefits**: The `ModuleServiceProvider` abstract class provides:
+- Translation loading from `modules/<Name>/lang/`
+- Config merging from `modules/<Name>/config/`
+- Migration discovery from `modules/<Name>/database/migrations/`
+- Inertia data sharing (module config available in all Vue components)
+
+This eliminates boilerplate and ensures consistent behavior across modules.
+
+#### Module Provider Example
 
 ```php
 // modules/Auth/app/Providers/AuthServiceProvider.php
@@ -222,8 +238,75 @@ class AuthServiceProvider extends ModuleServiceProvider
     protected array $providers = [
         RouteServiceProvider::class,
     ];
+
+    // Optional: Override boot for module-specific setup
+    public function boot(): void
+    {
+        parent::boot(); // Always call parent
+
+        // Add module-specific boot logic
+        $this->registerEventListeners();
+        $this->configureThirdPartyServices();
+    }
+
+    protected function registerEventListeners(): void
+    {
+        Event::listen(UserLoggedIn::class, UpdateLoginStats::class);
+    }
+
+    protected function configureThirdPartyServices(): void
+    {
+        if (config('auth.oauth.google.enabled')) {
+            Socialite::extend('google', fn() => new GoogleProvider());
+        }
+    }
 }
 ```
+
+#### What Gets Registered
+
+When a module's service provider boots:
+
+1. **Routes**: Loaded from `routes/web.php` and `routes/api.php`
+2. **Migrations**: Discovered from `database/migrations/`
+3. **Translations**: Loaded from `lang/en/`, `lang/pt_BR/`, etc.
+4. **Config**: Merged into global config as `config('modulename.key')`
+5. **Commands**: Registered and available via `php artisan`
+6. **Nested Providers**: Any providers in the `$providers` array are registered
+
+All of this happens automatically when the module is enabled. Disable the module, and everything is unloaded.
+
+#### Sharing Data with Inertia
+
+The base `ModuleServiceProvider` automatically shares module config with all Inertia pages:
+
+```php
+// In ModuleServiceProvider base class
+Inertia::share([
+    "{$this->nameLower}.config" => fn() => config($this->nameLower),
+]);
+```
+
+This means your Vue components can access module configuration:
+
+```vue
+<script setup lang="ts">
+import { usePage } from '@inertiajs/vue3';
+
+const page = usePage();
+const authConfig = computed(() => page.props.auth.config);
+</script>
+```
+
+#### Module Lifecycle
+
+1. **Install**: Module copied to `modules/<Name>/`
+2. **Enable**: Added to `modules_statuses.json`
+3. **Boot**: Service provider loaded and `boot()` method called
+4. **Register**: Module components registered (routes, migrations, etc.)
+5. **Runtime**: Module fully integrated into application
+
+**Learn more**: [Module System Architecture](/architecture/module-system) for detailed module lifecycle information, or [Modules Guide](/fundamentals/modules) for practical usage.
 
 ## Request Flow
 

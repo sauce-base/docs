@@ -1,128 +1,75 @@
 ---
 sidebar_position: 4
 title: Directory Structure
-description: Understand the Saucebase codebase organization and file structure
+description: Understand Saucebase's unique modular architecture and file organization
 ---
 
 # Directory Structure
 
-Saucebase follows Laravel's conventions while adding a modular architecture. Understanding the directory structure helps you navigate the codebase and know where to add your code.
+Saucebase follows Laravel conventions but adds a powerful modular architecture. This guide focuses on **what's unique to Saucebase** vs standard Laravel.
 
-## Root Directory
+:::tip Standard Laravel Patterns
+Saucebase uses standard Laravel directory structure (`app/`, `config/`, `routes/`, `storage/`, etc.). See the [Laravel Documentation](https://laravel.com/docs/12.x/structure) for general Laravel patterns. This guide covers only Saucebase-specific architecture.
+:::
+
+## Root Directory Overview
 
 ```
 saucebase/
-├── app/                    # Core application code
-├── bootstrap/              # Application bootstrapping
-├── config/                 # Configuration files
-├── database/               # Migrations, factories, seeders
-├── docker/                 # Docker configuration
-├── lang/                   # Core translations (en, pt_BR)
-├── modules/                # Feature modules
-├── public/                 # Public assets (images, compiled assets)
-├── resources/              # Frontend code (Vue, CSS, views)
-├── routes/                 # Core application routes
-├── storage/                # Logs, cache, uploaded files
-├── tests/                  # PHPUnit and Playwright tests
-├── vendor/                 # Composer dependencies
-├── .env                    # Environment configuration
-├── artisan                 # Artisan CLI
-├── composer.json           # PHP dependencies
-├── package.json            # JavaScript dependencies
-├── phpunit.xml             # PHPUnit configuration
-├── playwright.config.ts    # Playwright E2E configuration
-└── vite.config.js          # Vite build configuration
+├── app/                    # Core application (standard Laravel)
+├── modules/                # ⭐ Feature modules (unique to Saucebase)
+├── resources/              # Frontend code with module support
+├── module-loader.js        # ⭐ Module asset discovery system
+├── modules_statuses.json   # ⭐ Module registry (enabled/disabled)
+├── vite.config.js          # ⭐ Module-aware Vite configuration
+├── playwright.config.ts    # ⭐ Module-aware E2E testing
+└── ...                     # Standard Laravel files
 ```
 
-## Core Application (`app/`)
+## Module Directory Structure
 
-```
-app/
-├── Console/
-│   ├── Commands/           # Custom Artisan commands
-│   │   └── SaucebaseInstallCommand.php
-│   └── Kernel.php          # Console kernel
-├── Exceptions/
-│   └── Handler.php         # Global exception handler
-├── Helpers/
-│   └── helpers.php         # Global helper functions (auto-loaded)
-├── Http/
-│   ├── Controllers/        # HTTP controllers
-│   ├── Middleware/         # Global middleware
-│   └── Kernel.php          # HTTP kernel
-├── Listeners/              # Event listeners
-├── Models/                 # Eloquent models
-│   └── User.php            # Base User model
-└── Providers/              # Service providers
-    ├── AppServiceProvider.php
-    ├── BreadcrumbServiceProvider.php
-    ├── FilamentServiceProvider.php
-    ├── MacroServiceProvider.php
-    ├── ModuleServiceProvider.php  # Base class for module providers
-    └── NavigationServiceProvider.php
-```
-
-### Key Files
-
-#### `app/Providers/AppServiceProvider.php`
-Core application configuration, HTTPS enforcement, module event discovery fixes.
-
-#### `app/Providers/MacroServiceProvider.php`
-Centralized location for all application macros (e.g., `->withSSR()`).
-
-#### `app/Providers/ModuleServiceProvider.php`
-Abstract base class that all module service providers must extend.
-
-#### `app/Helpers/helpers.php`
-Global helper functions auto-loaded via Composer. Add project-wide utilities here.
-
-## Modules (`modules/`)
-
-Each module is a self-contained feature package.
+Each module is a self-contained feature package with its own routes, migrations, tests, and frontend assets.
 
 ```
 modules/
 └── <ModuleName>/
     ├── app/
-    │   ├── Http/
-    │   │   ├── Controllers/
-    │   │   ├── Middleware/
-    │   │   └── Requests/
+    │   ├── Http/Controllers/
     │   ├── Models/
     │   ├── Providers/
-    │   │   └── <ModuleName>ServiceProvider.php
+    │   │   └── <ModuleName>ServiceProvider.php  # Extends ModuleServiceProvider
     │   └── Services/
     ├── config/
-    │   └── config.php
+    │   └── config.php           # Module configuration
     ├── database/
-    │   ├── factories/
-    │   ├── migrations/
-    │   └── seeders/
+    │   ├── migrations/          # Module-specific migrations
+    │   ├── seeders/
+    │   └── factories/
     ├── lang/
-    │   ├── en/
+    │   ├── en/                  # Module translations
     │   └── pt_BR/
     ├── resources/
     │   ├── css/
-    │   │   └── app.css
+    │   │   └── app.css          # Module styles
     │   └── js/
-    │       ├── app.ts        # Module setup hooks
-    │       ├── components/   # Vue components
-    │       └── pages/        # Inertia pages
+    │       ├── app.ts           # ⭐ Module lifecycle hooks (setup, afterMount)
+    │       ├── components/      # Module Vue components
+    │       └── pages/           # Module Inertia pages
     ├── routes/
-    │   ├── api.php
-    │   └── web.php
+    │   ├── web.php              # Auto-loaded when module enabled
+    │   └── api.php
     ├── tests/
     │   ├── Feature/
     │   ├── Unit/
-    │   └── e2e/             # Playwright tests
-    ├── vite.config.js       # Module asset paths
-    ├── playwright.config.ts # Module E2E config (optional)
-    └── module.json          # Module metadata
+    │   └── e2e/                 # Module E2E tests (auto-discovered)
+    ├── vite.config.js           # ⭐ Exports asset paths for collection
+    ├── playwright.config.ts     # Optional custom E2E config
+    └── module.json              # Module metadata
 ```
 
-### Module Discovery
+## Module Registry (`modules_statuses.json`)
 
-Modules are tracked in `modules_statuses.json`:
+Tracks which modules are enabled. Only enabled modules are loaded and built.
 
 ```json title="modules_statuses.json"
 {
@@ -131,233 +78,62 @@ Modules are tracked in `modules_statuses.json`:
 }
 ```
 
-Only enabled modules (`true`) are loaded and built.
+Managed automatically via `php artisan module:enable` and `php artisan module:disable` commands.
 
-## Frontend (`resources/`)
+## Unique Saucebase Files
 
-```
-resources/
-├── css/
-│   ├── app.css              # Main styles (imports Tailwind)
-│   └── theme.css            # Saucebase theme variables (OKLCH)
-├── js/
-│   ├── app.ts               # Main entry point (CSR)
-│   ├── ssr.ts               # SSR entry point
-│   ├── components/
-│   │   ├── layout/          # Layout components (Header, Footer, Sidebar)
-│   │   ├── ui/              # shadcn-vue components
-│   │   └── shared/          # Shared components
-│   ├── composables/         # Vue composables
-│   │   ├── useLocalization.ts
-│   │   ├── useSidebar.ts
-│   │   └── useTheme.ts
-│   ├── layouts/             # Inertia layouts
-│   │   ├── AppLayout.vue
-│   │   └── GuestLayout.vue
-│   ├── lib/                 # Utility libraries
-│   │   ├── moduleSetup.ts   # Module lifecycle management
-│   │   └── utils.ts         # Utilities (resolveModularPageComponent, cn)
-│   ├── middleware/          # Inertia middleware
-│   │   └── auth.ts
-│   ├── pages/               # Core Inertia pages
-│   │   ├── Index.vue
-│   │   └── About.vue
-│   └── types/               # TypeScript types
-│       ├── global.d.ts      # Global type definitions
-│       └── inertia.d.ts     # Inertia type augmentations
-└── views/
-    └── app.blade.php        # Main HTML template
-```
+These files are specific to Saucebase's modular architecture:
 
-### Key Frontend Files
+### Backend Files
+- **`app/Providers/ModuleServiceProvider.php`** - Base class for module providers. All module service providers extend this class to automatically handle migrations, translations, config, and Inertia data sharing. [Learn more →](/fundamentals/modules)
+- **`app/Providers/MacroServiceProvider.php`** - Centralized macro registration for framework extensions (e.g., `->withSSR()`, `->withoutSSR()`). [Learn more →](/fundamentals/ssr#technical-implementation)
 
-#### `resources/js/app.ts`
-Main entry point for client-side rendering. Sets up:
-- Vue app instance
-- Inertia.js
-- Ziggy routes
-- Module lifecycle hooks
-- i18n
+### Frontend Files
+- **`resources/js/lib/moduleSetup.ts`** - Module lifecycle management system. Executes module `setup()` and `afterMount()` hooks. [Learn more →](/fundamentals/modules)
+- **`resources/js/lib/utils.ts`** - Contains `resolveModularPageComponent()` for module page resolution with namespace syntax (`Auth::Login`). [Learn more →](/fundamentals/modules)
+- **`resources/js/app.ts`** - Client-side rendering entry point
+- **`resources/js/ssr.ts`** - Server-side rendering entry point. [Learn more →](/fundamentals/ssr#technical-implementation)
 
-#### `resources/js/ssr.ts`
-SSR entry point. Similar to `app.ts` but for server-side rendering.
+### Build System Files
+- **`module-loader.js`** - Module discovery engine that collects assets, translations, and E2E test configs from enabled modules at build time. [Learn more →](/architecture/overview)
+- **`modules_statuses.json`** - Module registry tracking enabled/disabled state
+- **`vite.config.js`** - Module-aware Vite configuration that uses `module-loader.js` to build module assets
+- **`playwright.config.ts`** - Module-aware E2E testing configuration. [Learn more →](/development/testing-guide)
 
-#### `resources/js/lib/utils.ts`
-Contains `resolveModularPageComponent()` for module page resolution:
-- `Auth::Login` → `modules/Auth/resources/js/pages/Login.vue`
-- `Dashboard` → `resources/js/pages/Dashboard.vue`
+## Key Concepts
 
-#### `resources/js/lib/moduleSetup.ts`
-Module lifecycle management (`setup()`, `afterMount()` hooks).
+### Module System
+Modules are self-contained feature packages that install directly into your repository. Each module has its own service provider extending `ModuleServiceProvider`, which automatically handles migrations, translations, and configuration. [Learn more →](/fundamentals/modules)
 
-## Configuration (`config/`)
+### Server-Side Rendering
+Saucebase uses a two-level SSR control system with opt-in macros (`->withSSR()`, `->withoutSSR()`). SSR is disabled by default via middleware, and controllers explicitly enable it for pages needing SEO. [Learn more →](/fundamentals/ssr)
 
-```
-config/
-├── app.php                  # Application config
-├── auth.php                 # Authentication config
-├── database.php             # Database connections
-├── inertia.php              # Inertia.js configuration
-├── ziggy.php                # Ziggy route filtering
-├── modules.php              # Module system config
-└── ...                      # Standard Laravel configs
-```
+### Module Asset Discovery
+The `module-loader.js` reads `modules_statuses.json` to discover enabled modules, then collects their assets, translations, and test configs. Modules export asset paths via `vite.config.js` which are automatically included in the build. [Learn more →](/architecture/overview)
 
-### Important Configurations
+### Module Page Resolution
+Pages can be rendered from core (`Dashboard`) or modules (`Auth::Login`) using namespace syntax. The `resolveModularPageComponent()` function handles resolution automatically. [Learn more →](/fundamentals/modules)
 
-#### `config/inertia.php`
-```php
-'ssr' => [
-    'enabled' => (bool) env('INERTIA_SSR_ENABLED', true),
-    'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
-],
-```
+### Module Lifecycle Hooks
+Modules can export `setup()` and `afterMount()` hooks in `resources/js/app.ts` to run code before/after Vue app mounts. Used for registering components, plugins, or initializing services. [Learn more →](/fundamentals/modules)
 
-#### `config/ziggy.php`
-```php
-return [
-    'except' => ['admin.*', 'sanctum.*'], // Hide routes from frontend
-];
-```
+### Testing Architecture
+PHPUnit tests are organized into Unit, Feature, and Modules suites. Playwright E2E tests are auto-discovered from enabled modules, with each module getting its own test project (`@ModuleName`). [Learn more →](/development/testing-guide)
 
-## Docker (`docker/`)
+## What Makes Saucebase Different?
 
-```
-docker/
-├── nginx/
-│   └── default.conf         # Nginx configuration
-├── php/
-│   └── php.ini              # PHP configuration
-└── ssl/                     # SSL certificates (generated by installer)
-    ├── app.pem              # Certificate
-    └── app.key.pem          # Private key
-```
+Unlike traditional Laravel applications with packages, Saucebase uses a **copy-and-own philosophy**. Modules install directly into your repository, giving you complete control without vendor lock-in. The module system provides:
 
-## Database (`database/`)
-
-```
-database/
-├── factories/
-│   └── UserFactory.php
-├── migrations/              # Core migrations
-│   └── ...
-└── seeders/
-    ├── DatabaseSeeder.php
-    └── RolesDatabaseSeeder.php
-```
-
-Module migrations are in `modules/<Name>/database/migrations/`.
-
-## Tests (`tests/`)
-
-```
-tests/
-├── e2e/                     # Playwright E2E tests
-│   ├── helpers/
-│   │   └── ssr.ts           # SSR test helpers
-│   └── index.spec.ts
-├── Feature/                 # Laravel feature tests
-└── Unit/                    # Laravel unit tests
-```
-
-Module tests are in `modules/<Name>/tests/`.
-
-## Public Assets (`public/`)
-
-```
-public/
-├── build/                   # Compiled frontend assets (Vite output)
-│   ├── assets/
-│   └── manifest.json
-├── images/
-│   ├── logo.svg
-│   └── screenshots/
-├── favicon.ico
-└── robots.txt
-```
-
-:::warning Don't Edit
-Never manually edit files in `public/build/`. These are generated by `npm run build`.
-:::
-
-## Build Configuration
-
-### `vite.config.js`
-
-```javascript
-export default defineConfig({
-  plugins: [
-    laravel({
-      input: [
-        'resources/css/app.css',
-        'resources/js/app.ts',
-        'resources/js/ssr.ts',
-        ...collectModuleAssetsPaths(), // Automatically includes module assets
-      ],
-      ssr: 'resources/js/ssr.ts',
-    }),
-    vue(),
-    // ...
-  ],
-});
-```
-
-Key features:
-- Auto-loads SSL certificates if present
-- Collects module assets via `module-loader.js`
-- Provides path aliases (`@`, `@modules`, `ziggy-js`)
-
-### `module-loader.js`
-
-Utility that discovers enabled modules and collects:
-- Asset paths from module `vite.config.js`
-- Language directories
-- Playwright test configurations
-
-## Storage (`storage/`)
-
-```
-storage/
-├── app/
-│   └── public/              # User-uploaded files (symlinked to public/storage)
-├── framework/
-│   ├── cache/
-│   ├── sessions/
-│   └── views/               # Compiled Blade templates
-└── logs/
-    └── laravel.log
-```
-
-## Adding Your Code
-
-### Backend Code
-
-- **Controllers**: `app/Http/Controllers/` (core) or `modules/<Name>/app/Http/Controllers/`
-- **Models**: `app/Models/` (core) or `modules/<Name>/app/Models/`
-- **Services**: Create `app/Services/` or `modules/<Name>/app/Services/`
-- **Helpers**: `app/Helpers/helpers.php`
-
-### Frontend Code
-
-- **Pages**: `resources/js/pages/` (core) or `modules/<Name>/resources/js/pages/`
-- **Components**: `resources/js/components/` (shared) or `modules/<Name>/resources/js/components/`
-- **Composables**: `resources/js/composables/` (shared) or module-specific
-- **Styles**: `resources/css/` or `modules/<Name>/resources/css/`
-
-### Best Practices
-
-1. **Use modules for features** - Keep `app/` lean, put features in modules
-2. **Follow Laravel conventions** - Controllers in `Controllers/`, models in `Models/`, etc.
-3. **Keep modules self-contained** - Each module should be independently enable/disable-able
-4. **Use composables for shared logic** - Extract common Vue logic into composables
-5. **Follow naming conventions** - PascalCase for classes, camelCase for methods
+- **Auto-discovery** - Enabled modules are automatically discovered at build time
+- **Isolated structure** - Each module has its own routes, migrations, tests, and frontend assets
+- **Namespace syntax** - Render module pages with `Inertia::render('Auth::Login')`
+- **Lifecycle hooks** - Modules can run setup code before/after Vue app mounts
+- **Test isolation** - Each module gets its own PHPUnit suite and Playwright project
+- **SSR control** - Per-page SSR control with simple macros (`->withSSR()`)
 
 ## Next Steps
 
-- **[Learn About Modules](/fundamentals/modules)** - Install and manage feature modules
-- **[Explore Architecture](/architecture/overview)** - Deep dive into how it all works
-- **[Development Commands](/development/commands)** - Common development tasks
-
----
-
-Questions? Check the [Architecture](/architecture/overview) section for deeper explanations.
+- **[Module System Guide](/fundamentals/modules)** - Learn to install and manage modules
+- **[Architecture Overview](/architecture/overview)** - Deep dive into how everything works together
+- **[Development Commands](/development/commands)** - Common development workflows
+- **[Testing Guide](/development/testing-guide)** - Learn about PHPUnit and Playwright testing

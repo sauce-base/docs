@@ -6,24 +6,22 @@ description: Configure environment variables and settings for your Saucebase app
 
 # Configuration
 
-After installing Saucebase, you'll need to configure your application through environment variables and configuration files.
+After installing Saucebase, configure your application through environment variables in the `.env` file (created automatically from `.env.example`).
 
-## Environment Variables
-
-Saucebase uses Laravel's `.env` file for configuration. The installer creates this file automatically from `.env.example`.
+## Essential Environment Variables
 
 ### Core Application Settings
 
 #### APP_HOST & APP_URL
 
-These must match for the application to work correctly.
+**These must match** for the application to work correctly.
 
 ```env title=".env"
 APP_HOST=localhost
 APP_URL=https://localhost
 ```
 
-**For custom domains:**
+For custom domains:
 
 ```env
 APP_HOST=myapp.local
@@ -45,14 +43,23 @@ APP_SLUG=saucebase
 **Best practices:**
 - Use lowercase letters and hyphens only
 - Keep it short and memorable
-- Don't change after deployment (affects storage paths)
+- Don't change after deployment (affects storage paths and database names)
+
+#### Localization
+
+```env
+APP_LOCALE=en
+APP_FALLBACK_LOCALE=en
+```
+
+Supported locales: `en` (English), `pt_BR` (Brazilian Portuguese)
 
 #### VITE_LOCAL_STORAGE_KEY
 
 Frontend local storage prefix (defaults to `${APP_SLUG}`).
 
 ```env
-VITE_LOCAL_STORAGE_KEY=myapp
+VITE_LOCAL_STORAGE_KEY=saucebase
 ```
 
 This prevents localStorage conflicts when running multiple applications on localhost.
@@ -66,8 +73,8 @@ DB_CONNECTION=mysql
 DB_HOST=mysql                    # Docker service name
 DB_PORT=3306
 DB_DATABASE=saucebase
-DB_USERNAME=root
-DB_PASSWORD=root
+DB_USERNAME=saucebase
+DB_PASSWORD=secret
 ```
 
 **For external database:**
@@ -80,18 +87,46 @@ DB_USERNAME=your_username
 DB_PASSWORD=your_secure_password
 ```
 
-### Redis Configuration
+### Cache, Sessions & Queues
 
-Used for caching, sessions, and queues.
+**Important: Docker vs Local Environment Defaults**
 
-```env title=".env"
-REDIS_HOST=redis                 # Docker service name
-REDIS_PASSWORD=null
+| Component | Docker (recommended) | Local (non-Docker) | Config Variable |
+|-----------|---------------------|-------------------|-----------------|
+| Cache | `redis` | `database` | `CACHE_STORE` |
+| Sessions | `redis` | `database` | `SESSION_DRIVER` |
+| Queues | `redis` | `database` | `QUEUE_CONNECTION` |
+
+**Why the difference?**
+
+- **Docker environment**: `docker-compose.yml` provides fallback values that default to `redis` for better performance
+- **Local environment**: `.env.example` uses `database` driver to avoid requiring Redis installation
+
+**When using Docker** (recommended setup), Redis is automatically used unless you explicitly set these variables in `.env`:
+
+```env
+# Docker automatically uses Redis - no configuration needed
+# Redis connection is pre-configured:
+REDIS_HOST=redis
 REDIS_PORT=6379
+```
 
+**If running locally without Docker**, you can keep the database drivers or install Redis and set:
+
+```env
 CACHE_STORE=redis
 SESSION_DRIVER=redis
 QUEUE_CONNECTION=redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+```
+
+**To use database drivers in Docker**, explicitly set in `.env`:
+
+```env
+CACHE_STORE=database
+SESSION_DRIVER=database
+QUEUE_CONNECTION=database
 ```
 
 ### Mail Configuration
@@ -104,7 +139,6 @@ MAIL_HOST=mailpit
 MAIL_PORT=1025
 MAIL_USERNAME=null
 MAIL_PASSWORD=null
-MAIL_ENCRYPTION=null
 MAIL_FROM_ADDRESS=hello@example.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
@@ -120,9 +154,15 @@ MAIL_FROM_ADDRESS=noreply@yourdomain.com
 MAIL_FROM_NAME="${APP_NAME}"
 ```
 
-### OAuth Configuration (Auth Module)
+## Module-Specific Configuration
 
-If you've installed the Auth module, configure social login providers:
+### OAuth (Auth Module)
+
+If you've installed the Auth module, configure social login providers.
+
+:::info Configuration Location
+OAuth credentials are configured in `modules/Auth/config/services.php`, not `config/services.php`.
+:::
 
 #### Google OAuth
 
@@ -132,6 +172,15 @@ If you've installed the Auth module, configure social login providers:
 ```env title=".env"
 GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
+
+**For production:**
+
+```env
+# Update callback URL to your production domain
+# Redirect URI: https://yourdomain.com/auth/google/callback
+GOOGLE_CLIENT_ID=your-production-client-id
+GOOGLE_CLIENT_SECRET=your-production-client-secret
 ```
 
 #### GitHub OAuth
@@ -144,190 +193,70 @@ GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 ```
 
-:::tip Testing OAuth Locally
-For local development with HTTPS, use `https://localhost` as your redirect URL. OAuth providers typically allow localhost for development.
-:::
+**For production:**
 
-### Development Tools
-
-#### Xdebug
-
-Enabled by default for debugging.
-
-```env title=".env"
-XDEBUG_MODE=debug                # Options: off, debug, coverage, profile
+```env
+# Update callback URL to your production domain
+# Callback URL: https://yourdomain.com/auth/github/callback
+GITHUB_CLIENT_ID=your-production-client-id
+GITHUB_CLIENT_SECRET=your-production-client-secret
 ```
 
-Set to `off` to improve performance when not debugging.
+:::tip Testing OAuth Locally
+OAuth providers typically allow `localhost` for development. Use `https://localhost` as your redirect URL.
+:::
 
-#### Vite
+## Advanced Configuration
 
-Frontend build tool configuration.
+### Inertia SSR
+
+Server-side rendering is enabled in `config/inertia.php`, but **disabled by default per-request** via middleware.
+
+```php title="config/inertia.php"
+'ssr' => [
+    'enabled' => (bool) env('INERTIA_SSR_ENABLED', true), // SSR server runs
+    'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
+],
+```
+
+**How it works:**
+
+1. **Boot level** (config): SSR server runs when enabled
+2. **Request level** (middleware): Disables SSR by default for each request
+3. **Response level** (controller): Opt-in with `->withSSR()` or opt-out with `->withoutSSR()`
+
+```php
+// Enable SSR for SEO-critical pages
+return Inertia::render('Index')->withSSR();
+
+// Explicitly disable SSR (though middleware already does this)
+return Inertia::render('Dashboard')->withoutSSR();
+
+// Default - SSR disabled by middleware
+return Inertia::render('About');
+```
+
+Learn more in the [SSR Guide](/fundamentals/ssr).
+
+### Vite Environment Variables
+
+Frontend environment variables accessible via `import.meta.env`:
 
 ```env title=".env"
 VITE_APP_NAME="${APP_NAME}"
 VITE_LOCAL_STORAGE_KEY="${APP_SLUG}"
 ```
 
-These are accessible in Vue components via `import.meta.env`.
-
-### Docker Port Configuration
-
-Change these if default ports are already in use:
-
-```env title=".env"
-APP_PORT=80                      # HTTP port
-APP_HTTPS_PORT=443               # HTTPS port
-FORWARD_DB_PORT=3306            # MySQL port
-FORWARD_REDIS_PORT=6379          # Redis port
-FORWARD_MAILPIT_PORT=8025        # Mailpit web UI
-FORWARD_MAILPIT_SMTP_PORT=1025  # Mailpit SMTP
-```
-
-**Example for avoiding conflicts:**
+Add custom variables with the `VITE_` prefix:
 
 ```env
-APP_PORT=8080
-APP_HTTPS_PORT=8443
-FORWARD_DB_PORT=33060
-FORWARD_REDIS_PORT=63790
+VITE_API_BASE_URL=https://api.yourdomain.com
+VITE_ENABLE_ANALYTICS=true
 ```
 
-Then access your app at `https://localhost:8443`.
+### Multi-Tenancy
 
-## Configuration Files
-
-### Inertia SSR
-
-Server-side rendering is configured in `config/inertia.php`:
-
-```php title="config/inertia.php"
-'ssr' => [
-    'enabled' => (bool) env('INERTIA_SSR_ENABLED', true),
-    'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
-],
-```
-
-- `INERTIA_SSR_ENABLED=true` - SSR server runs (disabled per-request by middleware)
-- Controllers use `->withSSR()` to enable SSR for specific pages
-
-Learn more in the [SSR Guide](/fundamentals/ssr).
-
-### Ziggy Routes
-
-Configure which routes are exposed to JavaScript:
-
-```php title="config/ziggy.php"
-return [
-    'except' => [
-        'admin.*',           // Hide admin routes
-        'sanctum.*',         // Hide sanctum routes
-        '_debugbar.*',       // Hide debug routes
-    ],
-];
-```
-
-:::warning Security Note
-Route filtering is for reducing bundle size, not security. Always implement proper authentication and authorization.
-:::
-
-### CORS (Cross-Origin Resource Sharing)
-
-If building a separate frontend:
-
-```php title="config/cors.php"
-'paths' => ['api/*', 'sanctum/csrf-cookie'],
-'allowed_origins' => [
-    env('FRONTEND_URL', 'http://localhost:3000'),
-],
-'allowed_methods' => ['*'],
-'allowed_headers' => ['*'],
-'supports_credentials' => true,
-```
-
-Add `FRONTEND_URL` to `.env`:
-
-```env
-FRONTEND_URL=http://localhost:3000
-```
-
-## Multi-Tenancy Setup
-
-SSL certificates include wildcard support (`*.localhost`). To enable multi-tenancy:
-
-### 1. Install a Multi-Tenancy Package
-
-**Option A: Spatie Laravel Multitenancy**
-
-```bash
-composer require spatie/laravel-multitenancy
-php artisan vendor:publish --tag=multitenancy-config
-```
-
-**Option B: Tenancy for Laravel**
-
-```bash
-composer require stancl/tenancy
-php artisan tenancy:install
-```
-
-### 2. Configure Domain Pattern
-
-```env title=".env"
-# Central domain
-APP_URL=https://localhost
-
-# Tenant domain pattern
-TENANT_DOMAIN_PATTERN={tenant}.localhost
-```
-
-### 3. Update Nginx Configuration
-
-Ensure wildcard domains are handled:
-
-```nginx title="docker/nginx/default.conf"
-server {
-    listen 443 ssl http2;
-    server_name localhost *.localhost;
-    # ... rest of config
-}
-```
-
-Multi-tenancy setup documentation is coming soon.
-
-## Environment-Specific Configuration
-
-### Local Development
-
-```env
-APP_ENV=local
-APP_DEBUG=true
-XDEBUG_MODE=debug
-```
-
-### Staging
-
-```env
-APP_ENV=staging
-APP_DEBUG=true                   # Can enable for testing
-XDEBUG_MODE=off
-```
-
-### Production
-
-```env
-APP_ENV=production
-APP_DEBUG=false
-XDEBUG_MODE=off
-```
-
-:::danger Production Security
-- Set `APP_DEBUG=false` in production
-- Use strong `APP_KEY` (generated automatically)
-- Use HTTPS only (`APP_URL=https://...`)
-- Restrict database access
-- Use environment-specific `.env` files, never commit them
-:::
+SSL certificates include wildcard support (`*.localhost`) for multi-tenant applications. Install packages like [Spatie Laravel Multitenancy](https://spatie.be/docs/laravel-multitenancy) or [Tenancy for Laravel](https://tenancyforlaravel.com/) to enable multi-tenancy features.
 
 ## Verifying Configuration
 
@@ -344,16 +273,23 @@ php artisan config:show database
 php artisan migrate:status
 ```
 
+### Test Mail Setup
+
+```bash
+php artisan tinker
+# Then run:
+Mail::raw('Test email', fn($msg) => $msg->to('test@example.com')->subject('Test'));
+# Check http://localhost:8025 for the email
+```
+
 ### Test Cache Connection
 
 ```bash
 php artisan cache:clear
-```
-
-### Test Queue Connection
-
-```bash
-php artisan queue:work --once
+php artisan tinker
+# Then run:
+Cache::put('test', 'value', 60);
+Cache::get('test'); // Should return 'value'
 ```
 
 ## Troubleshooting
@@ -368,22 +304,40 @@ php artisan cache:clear
 php artisan optimize:clear
 ```
 
+**In Docker:**
+
+```bash
+docker compose exec app php artisan optimize:clear
+docker compose restart app
+```
+
 ### Environment Variables Not Loading
 
 1. Check `.env` file exists in project root
 2. Ensure no trailing spaces in `.env` values
-3. Restart Docker containers: `docker compose restart app`
+3. Quote values with spaces: `APP_NAME="My App"`
+4. Restart Docker containers: `docker compose restart app`
 
-### Port Already in Use
+### Port Conflicts
 
-Change ports in `.env`:
+If default ports are in use, change in `.env`:
 
 ```env
 APP_PORT=8080
 APP_HTTPS_PORT=8443
+FORWARD_DB_PORT=33060
+FORWARD_REDIS_PORT=63790
+FORWARD_MAILPIT_PORT=8026
 ```
 
-Then restart: `docker compose down && docker compose up -d`
+Then restart:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+Access your app at `https://localhost:8443` (using your custom HTTPS port).
 
 ## Next Steps
 
