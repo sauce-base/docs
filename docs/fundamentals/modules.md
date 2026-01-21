@@ -373,7 +373,27 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
 Access routes at: `https://localhost/auth/login`
 
-### 3. Frontend Integration
+### 3. Navigation Registration
+
+Modules can register navigation items by creating a `routes/navigation.php` file:
+
+```php title="modules/Auth/routes/navigation.php"
+use Spatie\Navigation\Facades\Navigation;
+use Spatie\Navigation\Section;
+
+Navigation::add('Log out', '#', function (Section $section) {
+    $section->attributes([
+        'group' => 'user',
+        'action' => 'logout',
+        'slug' => 'logout',
+        'order' => 100,
+    ]);
+});
+```
+
+Navigation is automatically loaded when the module is enabled. See [Navigation](./navigation.md) for details.
+
+### 4. Frontend Integration
 
 Module pages use namespace syntax in Inertia:
 
@@ -386,7 +406,7 @@ public function show()
 
 This resolves to: `modules/Auth/resources/js/pages/Login.vue`
 
-### 4. Module Lifecycle Hooks
+### 5. Module Lifecycle Hooks
 
 Modules can export setup hooks:
 
