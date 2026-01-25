@@ -54,6 +54,7 @@ const sidebars: SidebarsConfig = {
         'fundamentals/breadcrumbs',
         'fundamentals/theme-mode',
         'fundamentals/translations',
+        'fundamentals/impersonation',
         // 'fundamentals/authentication',
       ],
     },
