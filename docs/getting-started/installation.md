@@ -214,6 +214,77 @@ docker compose exec app php artisan module:enable Settings
 docker compose exec app php artisan module:migrate Settings --seed
 ```
 
+#### Configure Social Login (Optional)
+
+To enable social login features (Google, GitHub, etc.), follow these steps:
+
+##### 1. Enable the Trait
+
+Ensure the `useSocialite` trait is added to your User model:
+
+```php
+// app/Models/User.php
+use Modules\Auth\Traits\useSocialite;
+
+class User extends Authenticatable
+{
+    use HasFactory,
+        HasRoles,
+        InteractsWithMedia,
+        Notifiable,
+        useSocialite;  // Ensure this line is present
+
+    // ... rest of your model
+}
+```
+
+The `useSocialite` trait provides:
+- `socialAccounts()` - Relationship to connected OAuth providers
+- `getConnectedProvidersAttribute` - List of connected providers
+- `disconnectSocialProvider(string $provider)` - Disconnect a social account
+- `getLatestProviderAvatarUrlAttribute` - Get provider avatar URL
+
+##### 2. Create OAuth Applications
+
+**Google OAuth:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Navigate to "APIs & Services" → "Credentials"
+4. Click "Create Credentials" → "OAuth 2.0 Client ID"
+5. Configure consent screen if prompted
+6. Select "Web application" as application type
+7. Add authorized redirect URI: `https://localhost/auth/socialite/google/callback`
+8. Copy the Client ID and Client Secret
+
+**GitHub OAuth:**
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Click "New OAuth App"
+3. Fill in application details:
+   - Application name: Your app name
+   - Homepage URL: `https://localhost`
+   - Authorization callback URL: `https://localhost/auth/socialite/github/callback`
+4. Click "Register application"
+5. Copy the Client ID
+6. Generate a new Client Secret and copy it
+
+##### 3. Configure Environment Variables
+
+Add your OAuth credentials to `.env`:
+
+```env
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_CLIENT_REDIRECT_URI=/auth/socialite/google/callback
+
+GITHUB_CLIENT_ID=your-github-client-id
+GITHUB_CLIENT_SECRET=your-github-client-secret
+GITHUB_CLIENT_REDIRECT_URI=/auth/socialite/github/callback
+```
+
+:::tip Production Setup
+For production, update the redirect URIs in your OAuth apps to use your production domain (e.g., `https://yourdomain.com/auth/socialite/google/callback`).
+:::
+
 Learn more in the [Modules Guide](/fundamentals/modules).
 
 ### Step 9: Install Frontend Dependencies
