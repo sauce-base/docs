@@ -1,0 +1,33 @@
+/* Sidebar icon styling */
+.sidebarItemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.menu__link:hover .sidebarItemIcon,
+.menu__link--active .sidebarItemIcon {
+  opacity: 1;
+}
+
+.menu__link {
+  display: flex;
+  align-items: center;
+}
+
+.menu__link--active .sidebarItemIcon {
+  color: var(--ifm-color-primary);
+}
+
+.sidebarItemIcon svg {
+  transition: transform 0.2s ease;
+}
+
+.menu__link:hover .sidebarItemIcon svg {
+  transform: scale(1.1);
+}
