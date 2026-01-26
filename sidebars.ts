@@ -16,7 +16,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'doc',
       id: 'index',
-      label: 'Welcome',
+      label: 'What is saucebase',
       customProps: {
         icon: 'lucide:home',
       },

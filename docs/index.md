@@ -1,21 +1,25 @@
 ---
 sidebar_position: 1
-slug: /welcome
-title: Welcome
-description: Modular Laravel SaaS starter kit built on Vue, Inertia, Laravel, and Tailwind - you own the code
+slug: /what-is-saucebase
+title: What is Saucebase
+description: A modular Laravel SaaS starter kit with copy-and-own philosophy - build faster with code you fully control
 ---
 
 import ModuleGrid from '@site/src/components/ModuleGrid';
 
-# Welcome to Saucebase Documentation
+# What is Saucebase?
+
+Saucebase is a modular Laravel SaaS starter kit built on the [VILT stack](/reference/glossary#vilt-stack) (Vue 3, Inertia.js, Laravel 12, Tailwind CSS 4). Unlike traditional starter kits that trap you in vendor packages, Saucebase gives you complete ownership of the code.
+
+When you install Saucebase modules, they copy directly into your repository - not as external dependencies. You own every line of code and can modify, refactor, or rebuild features to match your exact needs. It's a foundation you control, not a framework you're locked into.
+
+Saucebase provides everything you need to build production-ready SaaS applications: authentication, team management, subscriptions, admin panels, and more - all with modern tooling and best practices built in.
+
+## Why Saucebase?
 
 Most Laravel starter kits trap you in a vendor package. You fight their architecture, maintain patches, and pray updates don't break your customizations.
 
-**Saucebase gives you the code. You own it completely.**
-
-Built on the [VILT stack](/reference/glossary#vilt-stack) (Vue 3, Inertia.js, Laravel 12, Tailwind CSS 4), Saucebase provides a production-ready foundation for building SaaS applications while giving you complete control over every line of code.
-
-## What Makes Saucebase Different?
+**Saucebase solves this with a copy-and-own philosophy.**
 
 ### Copy-and-Own Philosophy
 
@@ -44,7 +48,15 @@ composer require saucebase/auth
 When you install a Saucebase module, you're not adding a dependency. You're acquiring source code. From day one, you control the roadmap, the updates, and the architecture.
 :::
 
-### Built for Speed
+## Key Features
+
+Saucebase combines modular architecture with modern tooling to help you build faster while maintaining complete control.
+
+### Modular Architecture
+
+[Modules](/reference/glossary#module) are self-contained features that install into your codebase. Each module includes everything it needs - models, migrations, controllers, views, tests - and lives in your `modules/` directory where you can modify it freely.
+
+### Modern Development Experience
 
 We've optimized the development experience so you can build faster:
 
@@ -53,7 +65,16 @@ We've optimized the development experience so you can build faster:
 - **Type-safe routes**: [Ziggy](/reference/glossary#ziggy) generates TypeScript helpers from your Laravel routes, so you get autocomplete and type checking
 - **SSR when you need it**: Enable [server-side rendering](/reference/glossary#ssr-server-side-rendering) for specific pages to improve SEO and performance
 
-### Modern Stack
+### Production Ready
+
+Saucebase includes everything you need for production deployments:
+
+- **Code quality tools**: [PHPStan](/reference/glossary#phpstan) level 9, [Laravel Pint](/reference/glossary#laravel-pint), ESLint, and commitlint ensure clean, consistent code
+- **Comprehensive testing**: [Playwright](/reference/glossary#playwright) for E2E testing, PHPUnit for backend tests, all pre-configured
+- **Admin panel**: [Filament 4](/reference/glossary#filament) admin panel included with beautiful UI and powerful tools
+- **Queue monitoring**: [Horizon](/reference/glossary#horizon) for managing background jobs and queues
+
+## Technology Stack
 
 Saucebase uses cutting-edge tools that make development enjoyable:
 
@@ -168,24 +189,15 @@ The code now lives in your `modules/Auth` directory. You can open the files and 
 Check out our [module creation guide](/fundamentals/modules) to learn how to build custom modules for your specific needs.
 :::
 
-## Documentation Structure
+## What's Next?
 
-This documentation is organized to help you find what you need quickly:
+Ready to dive deeper? Here are the key resources to explore:
 
-### [Getting Started](/)
-New to Saucebase? Start here. You'll learn how to install Saucebase, configure your environment, and understand the project structure.
-
-### [Architecture](/architecture/overview)
-Learn how Saucebase works internally. We cover the modular system, frontend and backend architecture, and how everything connects.
-
-### [Features](/fundamentals/modules)
-Master the core features you'll use every day: modules, routing, SSR, and translations.
-
-### [Development](/development/commands)
-Daily development guides including available commands, coding standards, and git workflow.
-
-### [Reference](/reference/glossary)
-Quick reference materials including our glossary of technical terms and troubleshooting guides.
+- **[Get Started](/)** - Complete installation and configuration guide
+- **[Architecture](/architecture/overview)** - Understand how Saucebase works under the hood
+- **[Modules](/fundamentals/modules)** - Learn to work with and create modules
+- **[Development](/development/commands)** - Daily development workflow and commands
+- **[Reference](/reference/glossary)** - Glossary and troubleshooting guides
 
 ## Need Help?
 
