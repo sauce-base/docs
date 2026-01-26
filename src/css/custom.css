@@ -4,6 +4,8 @@
  * Enhanced with shadcn-inspired modern design
  */
 
+@import './sidebar-icons.css';
+
 /* Light mode - Purple primary theme */
 :root {
   /* Primary color - Purple (from Saucebase --primary: oklch(0.51 0.17 278.25)) */

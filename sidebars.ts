@@ -16,28 +16,93 @@ const sidebars: SidebarsConfig = {
     {
       type: 'doc',
       id: 'index',
-      label: 'Welcome',
+      label: 'What is saucebase',
+      customProps: {
+        icon: 'lucide:home',
+      },
     },
     {
       type: 'category',
       label: 'Getting Started',
       collapsed: false,
+      customProps: {
+        icon: 'lucide:rocket',
+      },
       items: [
-        'getting-started/installation',
-        'getting-started/configuration',
-        'getting-started/directory-structure',
+        {
+          type: 'doc',
+          id: 'getting-started/installation',
+          label: 'Installation',
+          customProps: {
+            icon: 'lucide:download',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'getting-started/configuration',
+          label: 'Configuration',
+          customProps: {
+            icon: 'lucide:settings',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'getting-started/directory-structure',
+          label: 'Directory Structure',
+          customProps: {
+            icon: 'lucide:folder-tree',
+          },
+        },
       ],
     },
     {
       type: 'category',
       label: 'Architecture',
       collapsed: true,
+      customProps: {
+        icon: 'lucide:layers',
+      },
       items: [
-        'architecture/philosophy',
-        'architecture/module-system',
-        'architecture/overview',
-        'architecture/frontend',
-        'architecture/backend',
+        {
+          type: 'doc',
+          id: 'architecture/philosophy',
+          label: 'Philosophy',
+          customProps: {
+            icon: 'lucide:lightbulb',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'architecture/module-system',
+          label: 'Module System',
+          customProps: {
+            icon: 'lucide:boxes',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'architecture/overview',
+          label: 'Overview',
+          customProps: {
+            icon: 'lucide:eye',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'architecture/frontend',
+          label: 'Frontend',
+          customProps: {
+            icon: 'lucide:monitor',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'architecture/backend',
+          label: 'Backend',
+          customProps: {
+            icon: 'lucide:server-cog',
+          },
+        },
         // 'architecture/asset-pipeline',
         // 'architecture/testing',
       ],
@@ -46,15 +111,74 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Features',
       collapsed: true,
+      customProps: {
+        icon: 'lucide:puzzle',
+      },
       items: [
-        'fundamentals/modules',
-        'fundamentals/ssr',
-        'fundamentals/routing',
-        'fundamentals/navigation',
-        'fundamentals/breadcrumbs',
-        'fundamentals/theme-mode',
-        'fundamentals/translations',
-        'fundamentals/impersonation',
+        {
+          type: 'doc',
+          id: 'fundamentals/modules',
+          label: 'Modules',
+          customProps: {
+            icon: 'lucide:package',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/ssr',
+          label: 'SSR',
+          customProps: {
+            icon: 'lucide:server',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/routing',
+          label: 'Routing',
+          customProps: {
+            icon: 'lucide:route',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/navigation',
+          label: 'Navigation',
+          customProps: {
+            icon: 'lucide:compass',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/breadcrumbs',
+          label: 'Breadcrumbs',
+          customProps: {
+            icon: 'lucide:chevrons-right',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/theme-mode',
+          label: 'Theme Mode',
+          customProps: {
+            icon: 'lucide:sun-moon',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/translations',
+          label: 'Translations',
+          customProps: {
+            icon: 'lucide:languages',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'fundamentals/impersonation',
+          label: 'Impersonation',
+          customProps: {
+            icon: 'lucide:user-cog',
+          },
+        },
         // 'fundamentals/authentication',
       ],
     },
@@ -62,11 +186,42 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Development',
       collapsed: true,
+      customProps: {
+        icon: 'lucide:code-2',
+      },
       items: [
-        'development/commands',
-        'development/git-workflow',
-        'development/coding-standards',
-        'development/testing-guide',
+        {
+          type: 'doc',
+          id: 'development/commands',
+          label: 'Commands',
+          customProps: {
+            icon: 'lucide:terminal',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'development/git-workflow',
+          label: 'Git Workflow',
+          customProps: {
+            icon: 'lucide:git-branch',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'development/coding-standards',
+          label: 'Coding Standards',
+          customProps: {
+            icon: 'lucide:file-check',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'development/testing-guide',
+          label: 'Testing Guide',
+          customProps: {
+            icon: 'lucide:flask-conical',
+          },
+        },
         // 'development/debugging',
       ],
     },
@@ -86,9 +241,26 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Reference',
       collapsed: true,
+      customProps: {
+        icon: 'lucide:book-open',
+      },
       items: [
-        'reference/troubleshooting',
-        'reference/glossary',
+        {
+          type: 'doc',
+          id: 'reference/troubleshooting',
+          label: 'Troubleshooting',
+          customProps: {
+            icon: 'lucide:wrench',
+          },
+        },
+        {
+          type: 'doc',
+          id: 'reference/glossary',
+          label: 'Glossary',
+          customProps: {
+            icon: 'lucide:book-text',
+          },
+        },
         // 'reference/environment-variables',
         // 'reference/artisan-commands',
         // 'reference/npm-scripts',
