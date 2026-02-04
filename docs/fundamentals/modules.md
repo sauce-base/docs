@@ -426,6 +426,64 @@ export default {
 };
 ```
 
+### 6. Checking Module Availability in Frontend
+
+Use the `useModules` composable to conditionally render UI based on enabled modules.
+
+Modules are shared as a key-value map where the key is the module identifier and the value is the module name from `Module::getName()`:
+
+```typescript
+// Example modules prop structure
+{ Auth: 'Auth', Settings: 'Settings', Billing: 'Billing' }
+```
+
+**Usage:**
+
+```typescript
+import { modules } from '@/composables/useModules';
+
+// Check if a module is enabled (by key)
+if (modules().has('Auth')) { }
+if (modules().has('Settings')) { }
+
+// Get all enabled module names
+const enabledModules = modules().all();
+// → ['Auth', 'Settings', 'Billing']
+```
+
+**In Vue components:**
+
+```vue title="Example usage in a component"
+<script setup lang="ts">
+import { modules } from '@/composables/useModules';
+
+// Destructured pattern
+const { has, all } = modules();
+</script>
+
+<template>
+  <!-- Conditionally render based on module availability -->
+  <nav>
+    <Link v-if="modules().has('Auth')" :href="route('auth.login')">
+      Login
+    </Link>
+
+    <Link v-if="modules().has('Settings')" :href="route('settings.index')">
+      Settings
+    </Link>
+
+    <Link v-if="modules().has('Billing')" :href="route('billing.index')">
+      Billing
+    </Link>
+  </nav>
+</template>
+```
+
+This is useful for:
+- Showing/hiding navigation items based on installed modules
+- Conditionally loading module-specific features
+- Building adaptive UIs that respond to the module configuration
+
 ## Customizing Modules
 
 Since modules are part of your codebase, customize freely:
