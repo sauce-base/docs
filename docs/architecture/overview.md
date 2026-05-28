@@ -89,7 +89,7 @@ This gives you control over when SSR overhead makes sense.
 TypeScript flows from backend to frontend:
 - Controllers define data types
 - Inertia props are type-safe
-- Vue components get autocomplete and type checking
+- Frontend components get autocomplete and type checking
 - Build-time validation catches errors early
 
 This makes refactoring safe and development faster.
@@ -113,14 +113,14 @@ When you install a module, its code is copied into your repository. You're not d
 3. Route resolves to controller
 4. Controller returns Inertia response (JSON)
 5. Blade template renders with embedded JSON
-6. Vue hydrates and displays the page
+6. Frontend framework hydrates and displays the page
 
 ### Subsequent Navigation (SPA)
 
 1. User clicks a link
 2. Inertia intercepts and makes XHR request
 3. Laravel returns JSON (no full HTML)
-4. Vue swaps page component
+4. Frontend swaps page component
 5. URL updates, page renders instantly
 
 This combines the best of traditional server-side apps (simple data flow) with modern SPAs (smooth navigation).
@@ -131,7 +131,7 @@ Dive deeper into specific architectural areas:
 
 - **[Design Philosophy](/architecture/philosophy)** - Why Saucebase is built this way
 - **[Module System](/architecture/module-system)** - How modular architecture works
-- **[Frontend Architecture](/architecture/frontend)** - Vue, Inertia, and TypeScript patterns
+- **[Frontend Architecture](/architecture/frontend)** - Framework choice, Inertia, and TypeScript patterns
 - **[Backend Architecture](/architecture/backend)** - Laravel patterns and practices
 - **[SSR Guide](/fundamentals/ssr)** - Server-side rendering details
 - **[Modules Guide](/fundamentals/modules)** - Working with modules in practice

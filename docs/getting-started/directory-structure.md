@@ -71,8 +71,18 @@ modules/
     │   ├── Unit/
     │   └── e2e/                 # Module E2E tests (auto-discovered)
     ├── vite.config.js           # ⭐ Exports asset paths for collection
-    └── composer.json
+    └── composer.json            # Module manifest (PSR-4 autoload + Laravel providers)
 ```
+
+## Module Discovery
+
+Modules are loaded based on their presence as Composer packages in `modules/`. There is no separate status file — Composer is the source of truth.
+
+- **Install**: `composer require saucebase/auth` — module is immediately active
+- **Remove**: `composer remove saucebase/auth` — module is deactivated
+- **List**: `php artisan modules:list` — shows all discovered modules
+
+Saucebase's module system is built on [InterNACHI/modular](https://github.com/InterNACHI/modular) — see that package for the full module API.
 
 ## Want to go deeper?
 

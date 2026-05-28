@@ -16,7 +16,15 @@ php artisan migrate
 npm run build
 ```
 
-That's it. `composer require` places the module in `modules/auth/`, registers its service provider, and activates it immediately. There is no separate enable step.
+`composer require` places the module in `modules/auth/`, registers its service provider, and activates it immediately. There is no separate enable step.
+
+### Seeding Module Data
+
+Some modules include seeders for initial data (roles, demo records, etc.):
+
+```bash
+php artisan modules:seed --module=auth
+```
 
 ### Applying Patches
 
@@ -38,6 +46,7 @@ composer require saucebase/auth
 
 # Inside container
 docker compose exec app php artisan migrate
+docker compose exec app php artisan modules:seed --module=auth
 
 # On host
 npm run build
@@ -63,7 +72,7 @@ The generated structure under `modules/blogpost/`:
 
 ```
 modules/blogpost/
-├── app/
+├── src/
 │   ├── Filament/           # Admin panel plugin
 │   ├── Http/Controllers/
 │   └── Providers/          # Service + Route providers
@@ -106,6 +115,29 @@ export function setup() {
 
 Use `'top'` to render before the page content, or `'bottom'` to render after. The component will appear on every page — no changes to core files needed. The component is responsible for deciding when to render itself (e.g. by checking an Inertia shared prop).
 
+## Managing Modules
+
+### List installed modules
+
+```bash
+php artisan modules:list
+```
+
+After adding or removing modules, sync the PHPUnit test suite config:
+
+```bash
+php artisan modules:sync
+```
+
+### Database operations
+
+```bash
+php artisan migrate              # runs all pending migrations including modules
+php artisan migrate:rollback     # rolls back last batch
+php artisan migrate:fresh --seed # CAUTION: destroys all data
+php artisan migrate:status       # check migration state
+```
+
 ## Removing Modules
 
 ```bash
@@ -118,21 +150,6 @@ composer remove saucebase/auth
 npm run build
 ```
 
-## Managing Modules
-
-### List installed modules
-
-```bash
-php artisan modules:list
-```
-
-### Database operations
-
-```bash
-php artisan migrate          # runs all pending migrations including modules
-php artisan migrate:rollback # rolls back last batch
-```
-
 ## Troubleshooting
 
 ### Module classes not found
@@ -142,12 +159,31 @@ composer dump-autoload
 php artisan optimize:clear
 ```
 
+### Module routes not working
+
+```bash
+# Check module is installed
+php artisan modules:list
+
+# Check routes are registered
+php artisan route:list --name=auth
+
+php artisan optimize:clear
+```
+
 ### Frontend assets not loading
 
 Rebuild after installing or removing any module:
 
 ```bash
 npm run build
+```
+
+### Migrations not running
+
+```bash
+php artisan migrate
+php artisan migrate:status
 ```
 
 ## Next Steps
