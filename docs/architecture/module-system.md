@@ -104,19 +104,19 @@ Routes are prefixed with the module name by default, preventing collisions. The 
 
 At build time, `module-loader.js` discovers module assets:
 
-1. Reads `modules_statuses.json` for enabled modules
+1. Scans the `modules/` directory for installed modules
 2. Finds each module's `vite.config.js`
 3. Extracts the `paths` array from each config
 4. Adds those paths to Vite's input
 
-This means modules automatically participate in the build process when enabled, and are excluded when disabled.
+Modules automatically participate in the build process when installed via Composer.
 
 ### Page Resolution
 
 Frontend page resolution works through namespace syntax:
 
-- `Auth::Login` → `modules/Auth/resources/js/pages/Login.vue`
-- `Dashboard` → `resources/js/pages/Dashboard.vue`
+- `Auth::Login` → `modules/auth/resources/js/vue/pages/Login.vue`
+- `Dashboard` → `resources/js/vue/pages/Dashboard.vue`
 
 The `resolveModularPageComponent()` function checks for the `::` separator and resolves paths accordingly. This keeps module pages isolated while maintaining a simple, readable syntax.
 
@@ -186,8 +186,8 @@ Modules can contribute to the shared Inertia `PageProps` type without touching a
 
 Create `resources/js/types/page-props.d.ts` in your module and augment `@inertiajs/vue3`'s `PageProps` interface:
 
-```typescript title="modules/MyModule/resources/js/types/page-props.d.ts"
-declare module '@inertiajs/vue3' {
+```typescript title="modules/mymodule/resources/js/types/page-props.d.ts"
+declare module '@inertiajs/core' {
   interface PageProps {
     my_shared_prop?: MyType;
   }
@@ -196,7 +196,7 @@ declare module '@inertiajs/vue3' {
 export {}; // required — makes this file a module
 ```
 
-Because `modules/**/resources/js/**/*.ts` is included in `tsconfig.json`, augmentations are picked up automatically the moment the module is enabled. No patches, no edits to core files.
+Because `modules/**/resources/js/**/*.ts` is included in `tsconfig.json`, augmentations are picked up automatically the moment the module is installed. No patches, no edits to core files.
 
 Use this for any data your module shares on every Inertia response via `shareInertiaData()` in your service provider.
 

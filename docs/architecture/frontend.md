@@ -1,532 +1,142 @@
+---
+sidebar_position: 1
+title: Frontend Architecture
+description: Framework choice, Inertia.js, and the frontend build system
+---
+
 # Frontend Architecture
 
-This guide explains Saucebase's frontend architecture, component structure, and build system.
+Saucebase supports **Vue 3** and **React** as first-class frontend frameworks. You pick one during setup — everything else (Inertia.js, Tailwind CSS, SSR, i18n, Ziggy routes) works the same regardless of choice.
 
-## Architecture Overview
+## Choosing a Framework
 
-```mermaid
-graph TB
-    Browser[Browser] -->|User Interaction| Vue[Vue 3 App]
-    Vue -->|Navigation| Inertia[Inertia.js Router]
-    Inertia -->|HTTP Request| Laravel[Laravel Backend]
-    Laravel -->|JSON Response| Inertia
-    Inertia -->|Update Component| Vue
-    Vue -->|Render| Browser
-
-    Vue -->|Use| Components[Vue Components]
-    Vue -->|State| Composables[Composables]
-    Vue -->|Utilities| Utils[Utility Functions]
-
-    Components -->|Styling| Tailwind[Tailwind CSS]
-    Components -->|i18n| I18n[Laravel Vue I18n]
-    Components -->|Routes| Ziggy[Ziggy Routes]
-```
-
-## Entry Points
-
-### Client-Side Rendering (app.ts)
-
-Main entry point for browser rendering:
-
-```typescript
-// resources/js/app.ts
-import { createApp, h, DefineComponent } from 'vue';
-import { createInertiaApp } from '@inertiajs/vue3';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import { resolveModularPageComponent } from './lib/utils';
-import { i18nVue } from 'laravel-vue-i18n';
-import { setupModules, afterMountModules } from './lib/moduleSetup';
-
-createInertiaApp({
-    resolve: (name) => resolveModularPageComponent(name, import.meta.glob<DefineComponent>([
-        './pages/**/*.vue',
-        '../../../modules/*/resources/js/pages/**/*.vue'
-    ])),
-
-    setup({ el, App, props, plugin }) {
-        const app = createApp({ render: () => h(App, props) });
-
-        // Register plugins
-        app.use(plugin);
-        app.use(ZiggyVue);
-        app.use(i18nVue, {
-            resolve: async (lang: string) => {
-                const langs = import.meta.glob<{ default: any }>('../../lang/*.json');
-                return await langs[`../../lang/${lang}.json`]();
-            },
-        });
-
-        // Module setup lifecycle
-        setupModules(app);
-
-        // Mount app
-        app.mount(el);
-
-        // Post-mount lifecycle
-        afterMountModules(app);
-
-        return app;
-    },
-});
-```
-
-### Server-Side Rendering (ssr.ts)
-
-Entry point for SSR server:
-
-```typescript
-// resources/js/ssr.ts
-import { createSSRApp, h, DefineComponent } from 'vue';
-import { renderToString } from '@vue/server-renderer';
-import { createInertiaApp } from '@inertiajs/vue3';
-import createServer from '@inertiajs/vue3/server';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-import { resolveModularPageComponent } from './lib/utils';
-import { i18nVue } from 'laravel-vue-i18n';
-import { setupModules } from './lib/moduleSetup';
-
-createServer((page) =>
-    createInertiaApp({
-        page,
-        render: renderToString,
-        resolve: (name) => resolveModularPageComponent(name, import.meta.glob<DefineComponent>([
-            './pages/**/*.vue',
-            '../../../modules/*/resources/js/pages/**/*.vue'
-        ])),
-
-        setup({ App, props, plugin }) {
-            const app = createSSRApp({ render: () => h(App, props) });
-
-            // Register plugins
-            app.use(plugin);
-            app.use(ZiggyVue, {
-                ...page.props.ziggy,
-                location: new URL(page.props.ziggy.location),
-            });
-            app.use(i18nVue, {
-                resolve: (lang: string) => {
-                    const langs = import.meta.glob<{ default: any }>('../../lang/*.json', { eager: true });
-                    return langs[`../../lang/${lang}.json`].default;
-                },
-            });
-
-            // Module setup (no afterMount in SSR)
-            setupModules(app);
-
-            return app;
-        },
-    })
-);
-```
-
-## Inertia Props Flow
-
-Data flows from Laravel controllers to Vue components as typed props:
-
-**Backend (Controller)**:
-```php
-return Inertia::render('Users/Index', [
-    'users' => User::with('roles')->paginate(10),
-    'filters' => $request->only(['search', 'role']),
-]);
-```
-
-**Frontend (Vue Component)**:
-```html
-<script setup lang="ts">
-interface Props {
-    users: PaginatedData<User>;
-    filters: { search?: string; role?: string };
-}
-
-const props = defineProps<Props>();
-</script>
-```
-
-The props are **type-safe** - TypeScript validates that the component receives the expected data structure. Changes to the backend immediately show type errors in the frontend.
-
-## Module Page Resolution
-
-Saucebase extends Inertia to support modular architecture with **namespace syntax**.
-
-### Resolution Logic
-
-```typescript
-// resources/js/lib/utils.ts
-import type { DefineComponent } from 'vue';
-
-export async function resolveModularPageComponent(
-    name: string,
-    pages: Record<string, () => Promise<DefineComponent>>
-): Promise<DefineComponent> {
-    // Check for module namespace syntax (Module::Page)
-    if (name.includes('::')) {
-        const [moduleName, pagePath] = name.split('::');
-        const path = `../../../modules/${moduleName}/resources/js/pages/${pagePath}.vue`;
-
-        const resolvedPage = pages[path];
-        if (!resolvedPage) {
-            throw new Error(`Page component not found: ${path}`);
-        }
-
-        return (await resolvedPage()).default;
-    }
-
-    // Core pages
-    const path = `./pages/${name}.vue`;
-    const resolvedPage = pages[path];
-
-    if (!resolvedPage) {
-        throw new Error(`Page component not found: ${path}`);
-    }
-
-    return (await resolvedPage()).default;
-}
-```
-
-### Usage in Controllers
-
-```php
-// Core page
-return Inertia::render('Dashboard');
-// Resolves to: resources/js/pages/Dashboard.vue
-
-// Module page
-return Inertia::render('Auth::Login');
-// Resolves to: modules/Auth/resources/js/pages/Login.vue
-```
-
-This namespace syntax keeps module pages isolated while maintaining simple, readable controller code.
-
-**Learn more**: [Modules Guide](/fundamentals/modules) for practical usage examples.
-
-## Module Lifecycle
-
-Modules can export setup hooks for initialization:
-
-```typescript
-// modules/Auth/resources/js/app.ts
-import type { App } from 'vue';
-
-export default {
-    // Called before app mounts (both CSR and SSR)
-    setup(app: App) {
-        // Register plugins, components, directives
-        app.component('CustomButton', CustomButton);
-        app.directive('focus', focusDirective);
-    },
-
-    // Called after app mounts (CSR only, not SSR)
-    afterMount(app: App) {
-        // Initialize services that require DOM
-        initAnalytics();
-        initWebSocket();
-    },
-};
-```
-
-### Module Setup Orchestration
-
-```typescript
-// resources/js/lib/moduleSetup.ts
-import type { App } from 'vue';
-
-// Dynamically import module setup files
-const moduleSetups = import.meta.glob<{ default: any }>(
-    '../../../modules/*/resources/js/app.ts',
-    { eager: true }
-);
-
-export function setupModules(app: App) {
-    Object.values(moduleSetups).forEach((moduleSetup) => {
-        if (moduleSetup.default?.setup) {
-            moduleSetup.default.setup(app);
-        }
-    });
-}
-
-export function afterMountModules(app: App) {
-    Object.values(moduleSetups).forEach((moduleSetup) => {
-        if (moduleSetup.default?.afterMount) {
-            moduleSetup.default.afterMount(app);
-        }
-    });
-}
-```
-
-## State Management
-
-Saucebase doesn't include a global state management library by default. Use these patterns:
-
-### 1. Composables (Recommended)
-
-Create reusable stateful logic with composables:
-
-```typescript
-// resources/js/composables/useAuth.ts
-import { ref, computed } from 'vue';
-import { usePage } from '@inertiajs/vue3';
-
-export function useAuth() {
-    const page = usePage();
-
-    const user = computed(() => page.props.auth?.user);
-    const isAuthenticated = computed(() => !!user.value);
-
-    return {
-        user,
-        isAuthenticated,
-    };
-}
-```
-
-Usage:
-
-```html
-<script setup lang="ts">
-import { useAuth } from '@/composables/useAuth';
-
-const { user, isAuthenticated } = useAuth();
-</script>
-
-<template>
-    <div v-if="isAuthenticated">
-        Welcome, {{ user.name }}!
-    </div>
-</template>
-```
-
-### 2. Shared Inertia Props
-
-Share data globally via Inertia middleware:
-
-```php
-// app/Http/Middleware/HandleInertiaRequests.php
-public function share(Request $request): array
-{
-    return [
-        ...parent::share($request),
-        'auth' => [
-            'user' => $request->user(),
-        ],
-        'flash' => [
-            'success' => $request->session()->get('success'),
-            'error' => $request->session()->get('error'),
-        ],
-        'locale' => app()->getLocale(),
-    ];
-}
-```
-
-Access in any component:
-
-```html
-<script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-
-const page = usePage();
-const flash = computed(() => page.props.flash);
-const locale = computed(() => page.props.locale);
-</script>
-```
-
-## Internationalization (i18n)
-
-### Translation Files
-
-```
-lang/
-├── en.json
-│   {
-│       "welcome": "Welcome",
-│       "logout": "Logout"
-│   }
-└── pt_BR.json
-    {
-        "welcome": "Bem-vindo",
-        "logout": "Sair"
-    }
-```
-
-### Usage in Components
-
-```html
-<script setup lang="ts">
-import { trans } from 'laravel-vue-i18n';
-</script>
-
-<template>
-    <div>
-        <h1>{{ trans('welcome') }}</h1>
-        <button>{{ trans('logout') }}</button>
-    </div>
-</template>
-```
-
-### Change Locale
-
-```html
-<script setup lang="ts">
-import { router } from '@inertiajs/vue3';
-import { loadLanguageAsync } from 'laravel-vue-i18n';
-
-const changeLocale = async (locale: string) => {
-    await loadLanguageAsync(locale);
-    router.visit(route('locale', { locale }));
-};
-</script>
-
-<template>
-    <button @click="changeLocale('en')">English</button>
-    <button @click="changeLocale('pt_BR')">Português</button>
-</template>
-```
-
-## Build System (Vite)
-
-### Configuration
-
-```javascript
-// vite.config.js
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import vue from '@vitejs/plugin-vue';
-import { collectModuleAssetsPaths, collectModuleLangPaths } from './module-loader.js';
-
-export default defineConfig({
-    plugins: [
-        laravel({
-            input: ['resources/css/app.css', 'resources/js/app.ts', ...collectModuleAssetsPaths()],
-            ssr: 'resources/js/ssr.ts',
-            refresh: true,
-        }),
-        vue({
-            template: {
-                transformAssetUrls: {
-                    base: null,
-                    includeAbsolute: false,
-                },
-            },
-        }),
-    ],
-    resolve: {
-        alias: {
-            '@': '/resources/js',
-            '@modules': '/modules/',
-            'ziggy-js': '/vendor/tightenco/ziggy',
-        },
-    },
-    ssr: {
-        noExternal: ['laravel-vue-i18n'],
-    },
-});
-```
-
-### Module Asset Collection
-
-The `module-loader.js` automatically discovers and includes enabled module assets:
-
-```javascript
-// module-loader.js
-export function collectModuleAssetsPaths() {
-    const enabledModules = getEnabledModules();
-    const assetPaths = [];
-
-    enabledModules.forEach((moduleName) => {
-        const configPath = `./modules/${moduleName}/vite.config.js`;
-        if (fs.existsSync(configPath)) {
-            const config = require(configPath);
-            const paths = config.default?.paths || [];
-            paths.forEach((path) => {
-                assetPaths.push(`modules/${moduleName}/resources/${path}`);
-            });
-        }
-    });
-
-    return assetPaths;
-}
-```
-
-### Development vs Production
+On first run, Saucebase shows a setup screen where you pick Vue or React. Run the command it shows:
 
 ```bash
-# Development (HMR enabled)
-npm run dev
-
-# Production build (optimized, minified)
-npm run build
-
-# SSR build
-npm run build:ssr
+php artisan saucebase:stack vue
+# or
+php artisan saucebase:stack react
 ```
 
-## TypeScript Integration
+This is a one-time, irreversible operation — it flattens the framework files into `resources/js/` and removes the other framework's directory. Choose carefully.
 
-### Type Definitions
+## Where Your Code Lives
+
+After setup, your frontend code lives under the active framework's directory:
+
+```
+resources/js/
+├── vue/            # Vue implementation (if Vue was chosen)
+│   ├── pages/
+│   ├── components/
+│   ├── layouts/
+│   └── composables/
+└── react/          # React implementation (if React was chosen)
+    ├── pages/
+    ├── components/
+    └── hooks/
+```
+
+The same structure applies inside modules:
+
+```
+modules/auth/resources/js/
+├── vue/
+│   └── pages/
+└── react/
+    └── pages/
+```
+
+## Inertia.js
+
+Inertia connects Laravel controllers to your frontend components without a REST API.
+
+**Controller returns a component name and props:**
+
+```php
+return Inertia::render('Dashboard', ['stats' => $stats]);
+```
+
+**Component receives them as typed props** — no fetch calls, no API endpoints.
+
+### Module Page Resolution
+
+Module pages use namespace syntax to keep them isolated:
+
+```php
+return Inertia::render('Auth::Login');   // modules/auth/.../pages/Login.vue
+return Inertia::render('Dashboard');      // resources/js/.../pages/Dashboard.vue
+```
+
+The `resolveModularPageComponent()` utility handles this automatically — you just use the namespace in your controllers.
+
+## SSR (Opt-In)
+
+SSR is disabled by default. Enable it per-route for pages that benefit from SEO:
+
+```php
+return Inertia::render('Products/Index')->withSSR();   // public/SEO pages
+return Inertia::render('Dashboard')->withoutSSR();      // authenticated pages
+```
+
+**Learn more**: [SSR Guide](/fundamentals/ssr)
+
+## Ziggy Routes
+
+The `route()` helper from Laravel is available in all frontend components:
 
 ```typescript
-// resources/js/types/global.d.ts
-import { PageProps as InertiaPageProps } from '@inertiajs/core';
-import { route as ziggyRoute } from 'ziggy-js';
-
-declare global {
-    var route: typeof ziggyRoute;
-}
-
-export interface User {
-    id: number;
-    name: string;
-    email: string;
-    email_verified_at?: string;
-}
-
-export interface Auth {
-    user: User | null;
-}
-
-export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
-    auth: Auth;
-    flash: {
-        success?: string;
-        error?: string;
-    };
-    locale: string;
-    ziggy: {
-        location: string;
-        query: Record<string, any>;
-    };
-};
-
-declare module 'vue' {
-    interface ComponentCustomProperties {
-        route: typeof ziggyRoute;
-    }
-}
+route('dashboard')
+route('user.show', { id: 1 })
+route().current('settings.*')
 ```
 
-### Using Types in Components
+## Translations (i18n)
 
-```html
-<script setup lang="ts">
-import type { PageProps, User } from '@/types/global';
+Translations are loaded asynchronously from `lang/` (core) and `modules/*/lang/` (modules). Use the `trans()` helper or the `$t()` function in templates.
 
-interface Props {
-    users: User[];
+**Learn more**: [Translations Guide](/fundamentals/translations)
+
+## TypeScript
+
+TypeScript path aliases are configured in `tsconfig.json`:
+
+| Alias | Resolves to |
+|---|---|
+| `@/` | `resources/js/` |
+| `@modules/` | `modules/` |
+| `@e2e/` | `tests/e2e/` |
+
+Always use these — never use relative `../../..` imports across directory boundaries.
+
+### Module Page Props
+
+Modules can contribute to the shared Inertia `PageProps` type without touching any core file. Create `resources/js/types/page-props.d.ts` in your module:
+
+```typescript
+declare module '@inertiajs/core' {
+  interface PageProps {
+    my_module_prop?: MyType;
+  }
 }
 
-const props = defineProps<Props>();
-
-// Type-safe page props
-import { usePage } from '@inertiajs/vue3';
-const page = usePage<PageProps>();
-
-// Auto-completion works!
-const user = page.props.auth.user;
-const flash = page.props.flash;
-</script>
+export {};
 ```
+
+Augmentations are picked up automatically when the module is installed.
+
+## Build System
+
+```bash
+npm run dev      # dev server with HMR
+npm run build    # production build (includes SSR)
+```
+
+`module-loader.js` automatically collects asset entry points from all installed modules — no manual Vite configuration needed when adding modules.
 
 ## Next Steps
 
-- [Backend Architecture](/architecture/backend) - Understand the Laravel backend
-- [Commands](/development/commands) - Build and development commands
+- [Backend Architecture](/architecture/backend)
+- [Module System](/architecture/module-system)
+- [SSR Guide](/fundamentals/ssr)
+- [Translations](/fundamentals/translations)

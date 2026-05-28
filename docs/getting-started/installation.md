@@ -2,14 +2,14 @@
 sidebar_position: 2
 slug: /
 title: Installation
-description: Install Saucebase locally using Docker — get running in three commands.
+description: Get Saucebase running locally in minutes.
 ---
 
 import ModuleGrid from '@site/src/components/ModuleGrid';
 
 # Installation
 
-Get Saucebase running locally in three commands.
+Get Saucebase running locally in minutes.
 
 ## Prerequisites
 
@@ -24,13 +24,11 @@ cd my-app
 bash bin/setup-env
 ```
 
-`bin/setup-env` starts the Docker containers, installs PHP dependencies, runs the Saucebase installer with all modules, and builds frontend assets. Visit **https://localhost** when it completes.
+`bin/setup-env` starts the Docker containers, installs dependencies, and runs the Saucebase installer. Visit **https://localhost** when it completes — the app will guide you through the remaining steps.
 
 ## Alternatives
 
 ### [Laravel Herd](https://herd.laravel.com)
-
-If you have [Laravel Herd](https://herd.laravel.com) installed, you can follow the steps below instead.
 
 ```bash
 git clone https://github.com/saucebase-dev/saucebase.git my-app
@@ -40,12 +38,11 @@ cp .env.example .env
 # Set APP_URL to your Herd site URL (e.g. http://my-app.test) in .env
 # Configure DB_* credentials in .env
 php artisan saucebase:install
-npm install && npm run dev
 ```
 
-### [Laravel Sail](https://laravel.com/docs/sail)
+Then visit your app — the setup screen will guide you through the remaining steps.
 
-If you prefer [Laravel Sail](https://laravel.com/docs/sail), you can follow the steps below instead.
+### [Laravel Sail](https://laravel.com/docs/sail)
 
 ```bash
 git clone https://github.com/saucebase-dev/saucebase.git my-app
@@ -55,12 +52,11 @@ cp .env.example .env
 sail up -d
 sail composer install
 sail artisan saucebase:install
-npm install && npm run dev
 ```
 
-### Native PHP
+Then visit your app — the setup screen will guide you through the remaining steps.
 
-If you'd prefer to run Saucebase without Docker, you can install it natively with PHP and Composer.
+### Native PHP
 
 ```bash
 git clone https://github.com/saucebase-dev/saucebase.git my-app
@@ -69,8 +65,9 @@ composer install
 cp .env.example .env
 # Configure APP_URL, DB_*, REDIS_* in .env
 php artisan saucebase:install
-npm install && npm run dev
 ```
+
+Then visit your app — the setup screen will guide you through the remaining steps.
 
 <ModuleGrid
   title="Explore the Modules"
