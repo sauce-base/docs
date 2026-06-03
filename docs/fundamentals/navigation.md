@@ -146,7 +146,7 @@ Navigation::add('Settings', fn () => route('settings.index'), function (Section 
 });
 ```
 
-No additional registration is needed — just create the file and enable the module.
+No additional registration is needed — just create the file and install the module.
 
 :::note
 Always use `fn () => route(...)` for named routes in module navigation files. The module system loads all `navigation.php` files before all `web.php` files, so direct `route()` calls would fail. See [Adding Navigation Items](#adding-navigation-items) for the full explanation.
