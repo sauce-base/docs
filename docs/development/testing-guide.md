@@ -214,7 +214,7 @@ database.setup
 ```
 
 - **`database.setup`** (`tests/e2e/database.setup.ts`) — runs `migrate:fresh --seed`. All test projects depend on it.
-- **`billing.setup`** (`modules/Billing/tests/e2e/billing.setup.ts`) — calls `BillingTestHelper::createSubscriberFixtures()` to set up subscription fixtures. Only `@Billing` depends on it.
+- **`billing.setup`** (`modules/billing/tests/e2e/billing.setup.ts`) — calls `BillingTestHelper::createSubscriberFixtures()` to set up subscription fixtures. Only `@Billing` depends on it.
 
 Only modules that export a `playwright.config.ts` get a setup step. Currently only Billing does.
 
