@@ -116,7 +116,7 @@ class DashboardTest extends TestCase
 Modules include their own PHPUnit tests under `modules/<ModuleName>/tests/`:
 
 ```
-modules/Auth/
+modules/auth/
 └── tests/
     ├── Feature/
     │   ├── LoginTest.php
@@ -127,7 +127,7 @@ modules/Auth/
 
 Module test classes follow the `Modules\<Name>\Tests` namespace:
 
-```php title="modules/Auth/tests/Feature/LoginTest.php"
+```php title="modules/auth/tests/Feature/LoginTest.php"
 <?php
 
 namespace Modules\Auth\Tests\Feature;
@@ -159,7 +159,7 @@ class LoginTest extends TestCase
 php artisan test --testsuite=Modules
 
 # Specific module
-php artisan test modules/Auth/tests
+php artisan test modules/auth/tests
 ```
 
 ### Test Organization Best Practices
@@ -213,8 +213,8 @@ database.setup
     └── @Billing 
 ```
 
-- **`database.setup`** (`tests/e2e/database.setup.ts`) — runs `migrate:fresh --seed` then `module:migrate-refresh --all --seed`. All test projects depend on it.
-- **`billing.setup`** (`modules/Billing/tests/e2e/billing.setup.ts`) — calls `BillingTestHelper::createSubscriberFixtures()` to set up subscription fixtures. Only `@Billing` depends on it.
+- **`database.setup`** (`tests/e2e/database.setup.ts`) — runs `migrate:fresh --seed`. All test projects depend on it.
+- **`billing.setup`** (`modules/billing/tests/e2e/billing.setup.ts`) — calls `BillingTestHelper::createSubscriberFixtures()` to set up subscription fixtures. Only `@Billing` depends on it.
 
 Only modules that export a `playwright.config.ts` get a setup step. Currently only Billing does.
 
@@ -223,8 +223,8 @@ Only modules that export a `playwright.config.ts` get a setup step. Currently on
 The root `playwright.config.ts` collects module configs via `module-loader.js` and appends the active device suffix to every project name. Check the file for details.
 
 **How module discovery works:**
-1. `module-loader.js` reads `modules_statuses.json` to find enabled modules
-2. For each enabled module, it checks for a `playwright.config.ts` in the module directory
+1. `module-loader.js` scans the `modules/` directory for installed Composer packages
+2. For each installed module, it checks for a `playwright.config.ts` in the module directory
 3. Modules without a `playwright.config.ts` still get a test project (prefixed `@ModuleName`), but no setup step
 4. Each project name gets the active device appended: `@Auth [Desktop Chrome]`
 
@@ -259,7 +259,7 @@ npm run test:e2e -- --grep "login"
 Module E2E tests are organized by feature into subdirectories. The Auth module is the reference example:
 
 ```
-modules/Auth/tests/e2e/
+modules/auth/tests/e2e/
 ├── pages/
 │   ├── LoginPage.ts
 │   ├── RegisterPage.ts
@@ -290,7 +290,7 @@ Core E2E tests live in `tests/e2e/` (no subdirectory nesting required).
 
 All module E2E tests use page object classes to encapsulate locators and interactions. Locators use `getByTestId` rather than raw CSS selectors:
 
-```typescript title="modules/Auth/tests/e2e/pages/LoginPage.ts"
+```typescript title="modules/auth/tests/e2e/pages/LoginPage.ts"
 import { expect, type Locator, type Page } from '@playwright/test';
 
 export class LoginPage {
@@ -323,7 +323,7 @@ export class LoginPage {
 ```
 
 **Using a page object in a spec:**
-```typescript title="modules/Auth/tests/e2e/tests/login/login.basic.spec.ts"
+```typescript title="modules/auth/tests/e2e/tests/login/login.basic.spec.ts"
 import { test, expect } from '../../fixtures';
 import { LoginPage } from '../../pages/LoginPage';
 
@@ -467,8 +467,8 @@ composer dump-autoload
 
 **Module tests not discovered:**
 ```bash
-# Verify the module is enabled
-cat modules_statuses.json
+# Verify the module is installed
+php artisan modules:list
 
 # List all discovered projects
 npm run test:e2e -- --list

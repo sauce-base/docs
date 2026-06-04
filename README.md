@@ -1,6 +1,6 @@
 # Saucebase Documentation
 
-This repository contains the comprehensive documentation for [Saucebase](https://github.com/saucebase-dev/saucebase) - a modular Laravel SaaS starter kit built on the VILT stack.
+This repository contains the comprehensive documentation for [Saucebase](https://github.com/saucebase-dev/saucebase) - a modular Laravel SaaS starter kit built on Laravel, Inertia.js, and Tailwind CSS with your choice of Vue 3 or React.
 
 ## 🌐 Live Documentation
 

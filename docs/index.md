@@ -12,7 +12,7 @@ import FeatureOverview from '@site/src/components/FeatureOverview';
 
 ![Installation Screenshot](</img/preview.gif>)
 
-Saucebase is a modular Laravel SaaS starter kit built on the [VILT stack](/reference/glossary#vilt-stack) (Vue, Inertia.js, Laravel, Tailwind CSS). Unlike traditional starter kits that trap you in vendor packages, Saucebase gives you complete ownership of the code.
+Saucebase is a modular Laravel SaaS starter kit built on Laravel, Inertia.js, and Tailwind CSS — with your choice of **Vue 3 or React** as the frontend framework. Unlike traditional starter kits that trap you in vendor packages, Saucebase gives you complete ownership of the code.
 
 When you install Saucebase modules, they copy directly into your repository - not as external dependencies. You own every line of code and can modify, refactor, or rebuild features to match your exact needs. It's a foundation you control, not a framework you're locked into.
 
@@ -34,7 +34,7 @@ Like [shadcn/ui](https://ui.shadcn.com), modules install **directly into your re
 
 ```bash
 composer require vendor/auth-package   # → Stuck in vendor/, can't modify
-composer require saucebase/auth        # → Copied to modules/Auth/, you own it
+composer require saucebase/auth        # → Copied to modules/auth/, you own it
 ```
 
 **What this means for you:**
@@ -138,14 +138,15 @@ The bootstrap script starts Docker containers (MySQL, Redis, Mailpit), generates
 php artisan saucebase:install
 ```
 
-The interactive installer prompts you to choose modules, runs `composer require`, enables them, and runs migrations. The code lands in your `modules/` directory — open the files and modify them however you want.
+The interactive installer prompts you to choose modules, runs `composer require`, and runs migrations. The code lands in your `modules/` directory — open the files and modify them however you want.
 
 If you prefer to install a single module manually:
 
 ```bash
 composer require saucebase/auth
-php artisan module:enable Auth
-php artisan module:migrate Auth --seed
+php artisan migrate
+php artisan modules:seed --module=auth
+npm run build
 ```
 
 <ModuleGrid />

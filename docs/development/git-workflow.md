@@ -213,7 +213,7 @@ ls -la .git/hooks/
 
 ```bash
 # Run linter on specific module
-vendor/bin/pint modules/Auth
+vendor/bin/pint modules/auth
 ```
 
 ### Permission Denied on Hooks

@@ -6,13 +6,13 @@ description: Add and organize navigation items in your Saucebase application usi
 
 # Navigation
 
-Saucebase provides a backend-driven navigation system built on [Spatie Navigation](https://github.com/spatie/laravel-navigation). You register menu items in PHP, organize them into groups, and they're automatically shared to your Vue frontend via Inertia props.
+Saucebase provides a backend-driven navigation system built on [Spatie Navigation](https://github.com/spatie/laravel-navigation). You register menu items in PHP, organize them into groups, and they're automatically shared to your frontend via Inertia props.
 
 ## How It Works
 
 - **Register** items in `routes/navigation.php` (or a module's `routes/navigation.php`)
 - **Group** items by purpose — `main`, `secondary`, `user`, `settings`, `landing`
-- **Access** them in Vue via `usePage().props.navigation`
+- **Access** them via `usePage().props.navigation`
 
 The Navigation service loads all files automatically — no manual registration or event listeners needed.
 
@@ -24,7 +24,7 @@ Use `Navigation::add()` to register items:
 use App\Facades\Navigation;
 use App\Navigation\Section;
 
-Navigation::add('Dashboard', route('dashboard'), function (Section $section) {
+Navigation::add('Dashboard', fn () => route('dashboard'), function (Section $section) {
     $section->attributes([
         'group' => 'main',
         'slug' => 'dashboard',
@@ -32,6 +32,12 @@ Navigation::add('Dashboard', route('dashboard'), function (Section $section) {
     ]);
 });
 ```
+
+:::tip Always wrap `route()` in a Closure
+Always pass named routes as `fn () => route('name')` — never call `route()` directly as the URL argument. The module system ([internachi/modular](https://github.com/InterNACHI/modular)) loads all `navigation.php` files before all `web.php` files, so named routes aren't registered yet at that point. Wrapping in a Closure defers the call to render time, after all routes are ready.
+
+Plain string URLs (`'https://...'`, `'#'`, `'/path'`) do not need wrapping.
+:::
 
 ### Attributes Reference
 
@@ -65,7 +71,7 @@ Navigation::add('Documentation', 'https://docs.example.com', function (Section $
 });
 
 // Badge — show a notification count
-Navigation::add('Notifications', route('notifications.index'), function (Section $section) {
+Navigation::add('Notifications', fn () => route('notifications.index'), function (Section $section) {
     $section->attributes([
         'group' => 'main',
         'slug' => 'notifications',
@@ -89,7 +95,7 @@ Navigation::add('Log out', '#', function (Section $section) {
 });
 
 // Custom styling
-Navigation::add('Admin', route('filament.admin.pages.dashboard'), function (Section $section) {
+Navigation::add('Admin', fn () => route('filament.admin.pages.dashboard'), function (Section $section) {
     $section->attributes([
         'group' => 'secondary',
         'slug' => 'admin',
@@ -110,27 +116,27 @@ Two methods for conditional navigation:
 // addWhen — re-evaluated every request
 Navigation::addWhen(
     fn () => Auth::check() && Auth::user()->isAdmin(),
-    'Admin', route('filament.admin.pages.dashboard'),
+    'Admin', fn () => route('filament.admin.pages.dashboard'),
     function (Section $section) { /* ... */ }
 );
 
 // addIf — checked once when navigation loads
 Navigation::addIf(
     Product::displayable()->count() > 0,
-    'Pricing', route('pricing'),
+    'Pricing', fn () => route('pricing'),
     function (Section $section) { /* ... */ }
 );
 ```
 
 ## Module Navigation
 
-Modules register navigation in their own `routes/navigation.php`. The file is loaded automatically when the module is enabled in `modules_statuses.json`.
+Modules register navigation in their own `routes/navigation.php`. The file is loaded automatically when the module is installed.
 
-```php title="modules/Settings/routes/navigation.php"
+```php title="modules/settings/routes/navigation.php"
 use App\Facades\Navigation;
 use App\Navigation\Section;
 
-Navigation::add('Settings', route('settings.index'), function (Section $section) {
+Navigation::add('Settings', fn () => route('settings.index'), function (Section $section) {
     $section->attributes([
         'group' => 'user',
         'slug' => 'settings',
@@ -140,7 +146,11 @@ Navigation::add('Settings', route('settings.index'), function (Section $section)
 });
 ```
 
-No additional registration is needed — just create the file and enable the module.
+No additional registration is needed — just create the file and install the module.
+
+:::note
+Always use `fn () => route(...)` for named routes in module navigation files. The module system loads all `navigation.php` files before all `web.php` files, so direct `route()` calls would fail. See [Adding Navigation Items](#adding-navigation-items) for the full explanation.
+:::
 
 ## Navigation Groups
 
@@ -171,7 +181,7 @@ $section->attributes([
 
 **In your module's `app.ts`**, register the matching component via `registerIcon()`:
 
-```typescript title="modules/Roadmap/resources/js/app.ts"
+```typescript title="modules/roadmap/resources/js/app.ts"
 import { registerIcon } from '@/lib/navigation';
 import IconMap from '~icons/heroicons/map';
 
@@ -186,7 +196,7 @@ Core icons (`dashboard`, `github`, `admin`, `documentation`) are pre-registered 
 
 ## Frontend Usage
 
-Navigation is shared via Inertia props, grouped by name:
+Navigation is shared via Inertia props, grouped by name. The example below uses Vue — React users replace `@inertiajs/vue3` with `@inertiajs/react` and use JSX, but the `usePage()` API and prop shape are identical.
 
 ```html
 <script setup lang="ts">

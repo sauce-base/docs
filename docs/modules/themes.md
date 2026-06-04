@@ -27,8 +27,6 @@ The theme editor is intended for the SaaS developer/owner, not end users. You de
 
 ```bash
 composer require saucebase/themes
-composer dump-autoload
-php artisan module:enable Themes
 npm run build
 ```
 
@@ -57,7 +55,7 @@ Replace `{theme-id}` with the theme name, for example `coffee` or `default`. Thi
 To see available themes:
 
 ```bash
-ls modules/Themes/resources/themes/
+ls modules/themes/resources/themes/
 ```
 
 ## Disabling the editor

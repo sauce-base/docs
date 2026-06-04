@@ -2,77 +2,40 @@
 sidebar_position: 2
 slug: /
 title: Installation
-description: Install Saucebase locally using Docker — get running in three commands.
+description: Get Saucebase running in minutes.
 ---
 
 import ModuleGrid from '@site/src/components/ModuleGrid';
 
 # Installation
 
-Get Saucebase running locally in three commands.
+One command. The setup screen walks you through the rest.
 
 ## Prerequisites
 
-- **Docker Desktop 20+** — runs all services (PHP, MySQL, Redis, Nginx)
-- **Node.js 22+** — for building frontend assets on the host
+You need **PHP 8.4+**, **Composer**, and the **Laravel installer**. If you don't have these yet, follow the [Laravel installation guide](https://laravel.com/docs/installation) — it takes about 5 minutes and covers macOS, Windows, and Linux.
 
-## Quick Start
-
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-bash bin/setup-env
-```
-
-`bin/setup-env` starts the Docker containers, installs PHP dependencies, runs the Saucebase installer with all modules, and builds frontend assets. Visit **https://localhost** when it completes.
-
-## Alternatives
-
-### [Laravel Herd](https://herd.laravel.com)
-
-If you have [Laravel Herd](https://herd.laravel.com) installed, you can follow the steps below instead.
+## Create Your App
 
 ```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-composer install
-cp .env.example .env
-# Set APP_URL to your Herd site URL (e.g. http://my-app.test) in .env
-# Configure DB_* credentials in .env
-php artisan saucebase:install
-npm install && npm run dev
+laravel new my-app --using=saucebase/saucebase
 ```
 
-### [Laravel Sail](https://laravel.com/docs/sail)
+Open the URL shown in your terminal. The setup screen will guide you through choosing a frontend framework and installing your first modules.
 
-If you prefer [Laravel Sail](https://laravel.com/docs/sail), you can follow the steps below instead.
+## Building with AI
 
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-cp .env.example .env
-# Configure .env for Sail (DB_HOST=mysql, REDIS_HOST=redis, etc.)
-sail up -d
-sail composer install
-sail artisan saucebase:install
-npm install && npm run dev
+Using Claude Code, Cursor, or another coding agent? Paste this before you start:
+
+```
+I'm building a SaaS with Saucebase — a modular Laravel starter kit.
+
+Read https://docs.saucebase.dev/for-agents.md for the project conventions, structure, and patterns. Treat it as the source of truth for how to add features, where files belong, and what commands to run.
 ```
 
-### Native PHP
-
-If you'd prefer to run Saucebase without Docker, you can install it natively with PHP and Composer.
-
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-composer install
-cp .env.example .env
-# Configure APP_URL, DB_*, REDIS_* in .env
-php artisan saucebase:install
-npm install && npm run dev
-```
+[Read the full agent guide →](/for-agents.md)
 
 <ModuleGrid
   title="Explore the Modules"
-  subtitle="Your foundation is ready. Browse the available modules and install the ones that fit your product — each one copies directly into your codebase, ready to customize."
+  subtitle="Browse the available modules and install the ones that fit your product — each one copies directly into your codebase, ready to customize."
 />

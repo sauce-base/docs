@@ -6,13 +6,13 @@ description: How routing works in Saucebase with Laravel, Inertia.js, and Ziggy
 
 # Routing
 
-Saucebase uses Laravel routes with Inertia.js for SPA navigation and Ziggy to access named routes from TypeScript. Module routes are loaded automatically when a module is enabled.
+Saucebase uses Laravel routes with Inertia.js for SPA navigation and Ziggy to access named routes from TypeScript. Module routes are loaded automatically when a module is installed.
 
 ## Module Routes
 
-Each module defines its own routes in `modules/<ModuleName>/routes/web.php`:
+Each module defines its own routes in `modules/<modulename>/routes/web.php`:
 
-```php title="modules/Auth/routes/web.php"
+```php title="modules/auth/routes/web.php"
 use Modules\Auth\app\Http\Controllers\AuthController;
 
 Route::prefix('auth')->name('auth.')->group(function () {
@@ -40,16 +40,16 @@ return Inertia::render('Settings/Profile');
 
 ### Module Pages
 
-Use namespace syntax to render pages from `modules/<ModuleName>/resources/js/pages/`:
+Use namespace syntax to render pages from `modules/<modulename>/resources/js/pages/`:
 
 ```php
-// Renders: modules/Auth/resources/js/pages/Login.vue
+// Renders: modules/auth/resources/js/pages/Login.vue
 return Inertia::render('Auth::Login');
 
-// Renders: modules/Settings/resources/js/pages/Index.vue
+// Renders: modules/settings/resources/js/pages/Index.vue
 return Inertia::render('Settings::Index');
 
-// Renders: modules/Settings/resources/js/pages/Profile/Edit.vue
+// Renders: modules/settings/resources/js/pages/Profile/Edit.vue
 return Inertia::render('Settings::Profile/Edit');
 ```
 

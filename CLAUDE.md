@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Docusaurus-based documentation site for **Saucebase** — a modular Laravel SaaS starter kit built on the VILT stack (Vue, Inertia.js, Laravel, Tailwind CSS). The documentation is deployed to GitHub Pages at https://saucebase-dev.github.io/docs/.
+This is a Docusaurus-based documentation site for **Saucebase** — a modular Laravel SaaS starter kit. The documentation is deployed to GitHub Pages at https://saucebase-dev.github.io/docs/.
+
+**Important context:** Saucebase supports both Vue 3 and React as frontend frameworks — documentation must remain framework-neutral. Do not write Vue-specific instructions or refer to the "VILT stack". Say "your frontend framework" or "Vue 3 or React" instead.
 
 ## Commands
 
@@ -95,6 +97,10 @@ title: Page Title
 description: Clear, concise description (50-160 characters)
 ---
 ```
+
+## Special Files
+
+- **`static/for-agents.md`** — Machine-readable agent guide served at `/for-agents.md`. Plain markdown, no Docusaurus rendering. Describes end-user project structure and conventions for AI coding agents. Keep this aligned with `saucebase/CLAUDE.md`.
 
 ## Related Repositories
 

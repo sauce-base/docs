@@ -23,9 +23,8 @@ The Billing module handles subscription management and payment processing. Users
 
 ```bash
 composer require saucebase/billing
-composer dump-autoload
-php artisan module:enable Billing
-php artisan module:migrate Billing --seed
+php artisan migrate
+php artisan modules:seed --module=billing
 npm run build
 ```
 
@@ -35,9 +34,9 @@ This module requires a EmailService configured in your app to send billing-relat
 
 **Docker:**
 ```bash
-composer require saucebase/billing && composer dump-autoload
-docker compose exec workspace php artisan module:enable Billing
-docker compose exec workspace php artisan module:migrate Billing --seed
+composer require saucebase/billing
+docker compose exec workspace php artisan migrate
+docker compose exec workspace php artisan modules:seed --module=billing
 npm run build
 ```
 
@@ -46,7 +45,7 @@ npm run build
 This step is required. Without it, `$user->billingCustomer` and all subscription checks will fail. Apply the provided patch:
 
 ```bash
-git apply modules/Billing/patches/user.patch
+git apply modules/billing/patches/user.patch
 ```
 
 <details>
@@ -129,7 +128,7 @@ Route::middleware('role:subscriber')->group(function () { ... });
 if ($user->hasRole('subscriber')) { ... }
 ```
 
-The `subscriber` role is seeded automatically when you run `php artisan module:migrate Billing --seed`.
+The `subscriber` role is seeded automatically when you run `php artisan modules:seed --module=billing`.
 
 ## Displaying pricing on the landing page
 
@@ -146,8 +145,8 @@ use Modules\Billing\Models\Product;
 **Vue page** — add the imports, prop, and template tag:
 
 ```ts title="resources/js/pages/Index.vue"
-import ProductSection from '@modules/Billing/resources/js/components/ProductSection.vue';
-import type { Product } from '@modules/Billing/resources/js/types';
+import ProductSection from '@modules/billing/resources/js/components/ProductSection.vue';
+import type { Product } from '@modules/billing/resources/js/types';
 // ...
 defineProps<{ products?: Product[] }>();
 ```

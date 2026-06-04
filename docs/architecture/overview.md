@@ -6,7 +6,7 @@ description: High-level overview of Saucebase architecture
 
 # Architecture Overview
 
-Saucebase is a modular Laravel SaaS starter kit built on the VILT stack (Vue 3, Inertia.js, Laravel 13, Tailwind CSS 4). It combines Laravel's backend power with Vue's reactive frontend, connected seamlessly through Inertia.js.
+Saucebase is a modular Laravel SaaS starter kit. The backend is Laravel 13 with Inertia.js — the frontend is your choice of **Vue 3 or React**, connected seamlessly through Inertia. Tailwind CSS 4 handles styling across both.
 
 ## High-Level Architecture
 
@@ -14,7 +14,7 @@ Saucebase is a modular Laravel SaaS starter kit built on the VILT stack (Vue 3, 
 graph TB
     Browser[Browser] -->|HTTPS Request| Laravel[Laravel Backend]
     Laravel -->|Inertia Response| Browser
-    Browser <-->|Vue SPA| Frontend[Vue 3 Frontend]
+    Browser <-->|SPA| Frontend[Frontend]
 
     Laravel --> Modules[Modules]
     Frontend --> ModulePages[Module Pages]
@@ -24,7 +24,7 @@ graph TB
     Laravel --> Queue[Background Jobs]
 
     style Browser fill:#8b5cf6,stroke:#7c3aed,color:#fff
-    style Frontend fill:#42b883,stroke:#35495e,color:#fff
+    style Frontend fill:#5b8fd9,stroke:#4a7bc0,color:#fff
     style Laravel fill:#ff2d20,stroke:#e0290f,color:#fff
     style Modules fill:#5b8fd9,stroke:#4a7bc0,color:#fff
 ```
@@ -33,7 +33,7 @@ graph TB
 1. Browser requests a page
 2. Laravel routes to a controller
 3. Controller returns Inertia response (JSON with component name and props)
-4. Vue receives props and renders the appropriate page
+4. Your frontend framework receives props and renders the appropriate page
 5. Subsequent navigation happens client-side without full page reloads
 
 This architecture eliminates the need for a separate REST API while providing a modern SPA experience.
@@ -44,7 +44,7 @@ This architecture eliminates the need for a separate REST API while providing a 
 
 Saucebase uses modules to organize features. Each module is self-contained with its own:
 - Routes, controllers, and models
-- Vue pages and components
+- Frontend pages and components
 - Migrations and tests
 - Translations
 
@@ -54,7 +54,7 @@ Modules live in your repository (`modules/<Name>/`), not in external packages. Y
 
 ### Inertia.js: No API Required
 
-Traditional SPAs require building and maintaining API endpoints. Inertia.js eliminates this by allowing controllers to pass data directly to Vue components as props.
+Traditional SPAs require building and maintaining API endpoints. Inertia.js eliminates this by allowing controllers to pass data directly to your frontend components as props.
 
 ```php
 // Controller
@@ -64,18 +64,7 @@ return Inertia::render('Dashboard', [
 ]);
 ```
 
-Vue components receive these props with full type safety:
-
-```html
-<script setup lang="ts">
-const props = defineProps<{
-    stats: Stats;
-    user: User;
-}>();
-</script>
-```
-
-No API layer, no REST endpoints, no GraphQL schema. Just straightforward data flow from backend to frontend.
+Your components receive these props with full type safety — no API layer, no REST endpoints, no GraphQL schema.
 
 **Learn more**: [Frontend Architecture](/architecture/frontend)
 
@@ -100,7 +89,7 @@ This gives you control over when SSR overhead makes sense.
 TypeScript flows from backend to frontend:
 - Controllers define data types
 - Inertia props are type-safe
-- Vue components get autocomplete and type checking
+- Frontend components get autocomplete and type checking
 - Build-time validation catches errors early
 
 This makes refactoring safe and development faster.
@@ -124,14 +113,14 @@ When you install a module, its code is copied into your repository. You're not d
 3. Route resolves to controller
 4. Controller returns Inertia response (JSON)
 5. Blade template renders with embedded JSON
-6. Vue hydrates and displays the page
+6. Frontend framework hydrates and displays the page
 
 ### Subsequent Navigation (SPA)
 
 1. User clicks a link
 2. Inertia intercepts and makes XHR request
 3. Laravel returns JSON (no full HTML)
-4. Vue swaps page component
+4. Frontend swaps page component
 5. URL updates, page renders instantly
 
 This combines the best of traditional server-side apps (simple data flow) with modern SPAs (smooth navigation).
@@ -142,7 +131,7 @@ Dive deeper into specific architectural areas:
 
 - **[Design Philosophy](/architecture/philosophy)** - Why Saucebase is built this way
 - **[Module System](/architecture/module-system)** - How modular architecture works
-- **[Frontend Architecture](/architecture/frontend)** - Vue, Inertia, and TypeScript patterns
+- **[Frontend Architecture](/architecture/frontend)** - Framework choice, Inertia, and TypeScript patterns
 - **[Backend Architecture](/architecture/backend)** - Laravel patterns and practices
 - **[SSR Guide](/fundamentals/ssr)** - Server-side rendering details
 - **[Modules Guide](/fundamentals/modules)** - Working with modules in practice

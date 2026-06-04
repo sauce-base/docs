@@ -19,8 +19,8 @@ saucebase/
 ├── app/                    # Core application (standard Laravel)
 ├── modules/                # ⭐ Feature modules (unique to Saucebase)
 ├── resources/              # Frontend code with module support
+├── frontend.json           # ⭐ Active framework (vue or react)
 ├── module-loader.js        # ⭐ Module asset discovery system
-├── modules_statuses.json   # ⭐ Module registry (enabled/disabled)
 ├── vite.config.js          # ⭐ Module-aware Vite configuration
 ├── playwright.config.ts    # ⭐ Module-aware E2E testing
 └── ...                     # Standard Laravel files
@@ -51,13 +51,19 @@ modules/
     │   ├── css/
     │   │   └── app.css          # Module styles
     │   └── js/
-    │       ├── app.ts           # ⭐ Module lifecycle hooks (setup, afterMount)
-    │       ├── components/      # Module Vue components
-    │       ├── layouts/
-    │       ├── pages/           # Module Inertia pages
-    │       └── types/
+    │       ├── app.ts           # ⭐ Entry point (proxies to active framework)
+    │       ├── types/           # Framework-agnostic TypeScript types
+    │       ├── vue/             # Vue implementation
+    │       │   ├── app.ts       # Module lifecycle hooks (setup, afterMount)
+    │       │   ├── pages/       # Module Inertia pages
+    │       │   ├── components/
+    │       │   └── layouts/
+    │       └── react/           # React implementation
+    │           ├── app.tsx
+    │           ├── pages/
+    │           └── components/
     ├── routes/
-    │   ├── web.php              # Auto-loaded when module enabled
+    │   ├── web.php              # Auto-loaded when module is installed
     │   ├── api.php
     │   └── navigation.php       # Module navigation items
     ├── tests/
@@ -65,28 +71,22 @@ modules/
     │   ├── Unit/
     │   └── e2e/                 # Module E2E tests (auto-discovered)
     ├── vite.config.js           # ⭐ Exports asset paths for collection
-    ├── composer.json
-    └── module.json              # Module metadata
+    └── composer.json            # Module manifest (PSR-4 autoload + Laravel providers)
 ```
 
-## Module Registry (`modules_statuses.json`)
+## Module Discovery
 
-Tracks which modules are enabled. Only enabled modules are loaded and built.
+Modules are loaded based on their presence as Composer packages in `modules/`. There is no separate status file — Composer is the source of truth.
 
-```json title="modules_statuses.json"
-{
-  "Auth": true,
-  "Settings": true
-}
-```
+- **Install**: `composer require saucebase/auth` — module is immediately active
+- **Remove**: `composer remove saucebase/auth` — module is deactivated
+- **List**: `php artisan modules:list` — shows all discovered modules
 
-Managed automatically via `php artisan module:enable` and `php artisan module:disable` commands. Saucebase's module system is built on [nWidart/laravel-modules](https://github.com/nWidart/laravel-modules) — see that package for the full module API.
+Saucebase's module system is built on [InterNACHI/modular](https://github.com/InterNACHI/modular) — see that package for the full module API.
 
 ## Want to go deeper?
 
-The structure above reflects how Saucebase ties modules together at the framework level. To understand how it all works:
-
-- **[Modules Overview](/modules/)** — How modules are loaded, enabled, and how lifecycle hooks work
-- **[Module System](/fundamentals/modules)** — How modules are loaded, enabled, and how lifecycle hooks work
-- **[SSR Setup](/fundamentals/ssr)** — Server-side rendering entry point and the `withSSR()` macro
-- **[Architecture Overview](/architecture/overview)** — How the module system, build pipeline, and frontend fit together
+- **[Module Management](/fundamentals/modules)** — Installing, removing, and creating modules
+- **[Module System](/architecture/module-system)** — How the module system works under the hood
+- **[Frontend Architecture](/architecture/frontend)** — Framework choice, Inertia, and the build pipeline
+- **[SSR](/fundamentals/ssr)** — Server-side rendering and the `withSSR()` macro
