@@ -55,7 +55,7 @@ Replace `{theme-id}` with the theme name, for example `coffee` or `default`. Thi
 To see available themes:
 
 ```bash
-ls modules/Themes/resources/themes/
+ls modules/themes/resources/themes/
 ```
 
 ## Disabling the editor

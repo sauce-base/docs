@@ -179,7 +179,7 @@ This communication happens through Laravel's standard patterns. Modules aren't i
 
 Modules can contribute to the shared Inertia `PageProps` type without touching any core file.
 
-Create `resources/js/types/page-props.d.ts` in your module and augment `@inertiajs/vue3`'s `PageProps` interface:
+Create `resources/js/types/page-props.d.ts` in your module and augment `@inertiajs/core`'s `PageProps` interface:
 
 ```typescript title="modules/mymodule/resources/js/types/page-props.d.ts"
 declare module '@inertiajs/core' {

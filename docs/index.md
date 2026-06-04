@@ -34,7 +34,7 @@ Like [shadcn/ui](https://ui.shadcn.com), modules install **directly into your re
 
 ```bash
 composer require vendor/auth-package   # → Stuck in vendor/, can't modify
-composer require saucebase/auth        # → Copied to modules/Auth/, you own it
+composer require saucebase/auth        # → Copied to modules/auth/, you own it
 ```
 
 **What this means for you:**

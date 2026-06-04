@@ -362,8 +362,8 @@ View file names should use `camelCase` and must correspond to the controller met
 
 ```php
 // Controller
-return inertia('Blog::Index');       // modules/Blog/resources/js/pages/Index.vue
-return inertia('Blog::PostShow');    // modules/Blog/resources/js/pages/PostShow.vue
+return inertia('Blog::Index');       // modules/blog/resources/js/pages/Index.vue
+return inertia('Blog::PostShow');    // modules/blog/resources/js/pages/PostShow.vue
 ```
 
 ## Validation

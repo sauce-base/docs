@@ -2,74 +2,40 @@
 sidebar_position: 2
 slug: /
 title: Installation
-description: Get Saucebase running locally in minutes.
+description: Get Saucebase running in minutes.
 ---
 
 import ModuleGrid from '@site/src/components/ModuleGrid';
 
 # Installation
 
-Get Saucebase running locally in minutes.
+One command. The setup screen walks you through the rest.
 
 ## Prerequisites
 
-- **Docker Desktop 20+** — runs all services (PHP, MySQL, Redis, Nginx)
-- **Node.js 22+** — for building frontend assets on the host
+You need **PHP 8.4+**, **Composer**, and the **Laravel installer**. If you don't have these yet, follow the [Laravel installation guide](https://laravel.com/docs/installation) — it takes about 5 minutes and covers macOS, Windows, and Linux.
 
-## Quick Start
-
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-bash bin/setup-env
-```
-
-`bin/setup-env` starts the Docker containers, installs dependencies, and runs the Saucebase installer. Visit **https://localhost** when it completes — the app will guide you through the remaining steps.
-
-## Alternatives
-
-### [Laravel Herd](https://herd.laravel.com)
+## Create Your App
 
 ```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-composer install
-cp .env.example .env
-# Set APP_URL to your Herd site URL (e.g. http://my-app.test) in .env
-# Configure DB_* credentials in .env
-php artisan saucebase:install
+laravel new my-app --using=saucebase/saucebase
 ```
 
-Then visit your app — the setup screen will guide you through the remaining steps.
+Open the URL shown in your terminal. The setup screen will guide you through choosing a frontend framework and installing your first modules.
 
-### [Laravel Sail](https://laravel.com/docs/sail)
+## Building with AI
 
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-cp .env.example .env
-# Configure .env for Sail (DB_HOST=mysql, REDIS_HOST=redis, etc.)
-sail up -d
-sail composer install
-sail artisan saucebase:install
+Using Claude Code, Cursor, or another coding agent? Paste this before you start:
+
+```
+I'm building a SaaS with Saucebase — a modular Laravel starter kit.
+
+Read https://docs.saucebase.dev/for-agents.md for the project conventions, structure, and patterns. Treat it as the source of truth for how to add features, where files belong, and what commands to run.
 ```
 
-Then visit your app — the setup screen will guide you through the remaining steps.
-
-### Native PHP
-
-```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-composer install
-cp .env.example .env
-# Configure APP_URL, DB_*, REDIS_* in .env
-php artisan saucebase:install
-```
-
-Then visit your app — the setup screen will guide you through the remaining steps.
+[Read the full agent guide →](/for-agents.md)
 
 <ModuleGrid
   title="Explore the Modules"
-  subtitle="Your foundation is ready. Browse the available modules and install the ones that fit your product — each one copies directly into your codebase, ready to customize."
+  subtitle="Browse the available modules and install the ones that fit your product — each one copies directly into your codebase, ready to customize."
 />

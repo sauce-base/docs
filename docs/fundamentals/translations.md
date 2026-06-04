@@ -53,7 +53,7 @@ lang/
 Modules have their own translation directories:
 
 ```
-modules/Auth/lang/
+modules/auth/lang/
 ├── en/
 │   └── auth.php
 │       return [
@@ -80,7 +80,7 @@ __('welcome');  // "Welcome"
 __('auth.failed');  // "These credentials do not match our records."
 
 // Module translations
-trans('auth::auth.failed');  // From modules/Auth/lang/en/auth.php
+trans('auth::auth.failed');  // From modules/auth/lang/en/auth.php
 
 // With replacements
 __('Hello, :name', ['name' => 'John']);  // "Hello, John"
@@ -265,7 +265,7 @@ class SetLocale
 ### Module Translation Structure
 
 ```
-modules/Auth/lang/
+modules/auth/lang/
 ├── en/
 │   ├── auth.php           # Authentication strings
 │   ├── validation.php     # Validation messages
@@ -353,8 +353,8 @@ i18nVue({
 touch lang/es.json
 
 # Module translations
-mkdir -p modules/Auth/lang/es
-touch modules/Auth/lang/es/auth.php
+mkdir -p modules/auth/lang/es
+touch modules/auth/lang/es/auth.php
 ```
 
 ### 2. Add Translations
@@ -369,7 +369,7 @@ touch modules/Auth/lang/es/auth.php
 ```
 
 ```php
-// modules/Auth/lang/es/auth.php
+// modules/auth/lang/es/auth.php
 return [
     'failed' => 'Estas credenciales no coinciden con nuestros registros.',
     'throttle' => 'Demasiados intentos de inicio de sesión.',
@@ -423,7 +423,7 @@ if (!isLoaded('my.key')) {
 ### Module Translations Not Working
 
 1. Check module is installed: `php artisan modules:list`
-2. Verify language files exist: `ls modules/Auth/lang/en/`
+2. Verify language files exist: `ls modules/auth/lang/en/`
 3. Rebuild assets: `npm run build`
 4. Clear caches: `php artisan optimize:clear`
 

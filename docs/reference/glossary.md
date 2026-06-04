@@ -28,7 +28,7 @@ The approach where code installs directly into your repository instead of stayin
 
 This concept has existed in various forms (vendoring, code generators, boilerplates), but was popularized in the modern frontend ecosystem by [shadcn/ui](https://ui.shadcn.com), which pioneered the "copy-paste components" approach. Saucebase applies this same philosophy to Laravel backend modules.
 
-**Example**: When you install the Auth module, the code copies into your `Modules/Auth` directory. It's now yours to customize.
+**Example**: When you install the Auth module, the code copies into your `modules/auth` directory. It's now yours to customize.
 
 **Read more**: [shadcn/ui Introduction](https://ui.shadcn.com/docs)
 **Related concept**: [Vendoring dependencies](https://stackoverflow.blog/2020/05/20/good-coders-borrow-great-coders-steal/)
@@ -111,7 +111,7 @@ A database version control system in Laravel. Each migration file describes chan
 **Official documentation**: [Laravel Migrations](https://laravel.com/docs/migrations)
 
 ### Module
-A self-contained feature package in Saucebase. Modules install directly into your `Modules/` directory and include everything needed: controllers, models, views, migrations, tests, and assets.
+A self-contained feature package in Saucebase. Modules install directly into your `modules/` directory and include everything needed: controllers, models, views, migrations, tests, and assets.
 
 **Available modules:**
 - [Auth](https://github.com/saucebase-dev/auth) - Authentication with social login
@@ -202,15 +202,6 @@ JavaScript with type checking. It helps catch bugs before running your code and 
 **GitHub**: [microsoft/TypeScript](https://github.com/microsoft/TypeScript)
 
 ## V
-
-### VILT Stack
-**V**ue + **I**nertia + **L**aravel + **T**ailwind. The technology stack that Saucebase is built on.
-
-**Component documentation:**
-- [Vue.js](https://vuejs.org/)
-- [Inertia.js](https://inertiajs.com/)
-- [Laravel](https://laravel.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
 
 ### Vite
 A modern build tool for frontend assets. It provides fast hot reload during development and optimized builds for production. Saucebase uses Vite to bundle Vue, TypeScript, and CSS.

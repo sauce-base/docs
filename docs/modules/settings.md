@@ -37,7 +37,7 @@ npm run build
 
 ## Configuration
 
-No environment variables are required. Social provider buttons on the profile page use Auth module routes and are automatically shown if the Auth module is enabled.
+No environment variables are required. Social provider buttons on the profile page use Auth module routes and are automatically shown if the Auth module is installed.
 
 All settings routes require email verification. Users who haven't verified their email are redirected to the verification prompt.
 

@@ -44,7 +44,7 @@ npm run build
 This step is required for social login and the Settings module's provider display to work. Apply the provided patch:
 
 ```bash
-git apply modules/Auth/patches/user.patch
+git apply modules/auth/patches/user.patch
 ```
 
 <details>

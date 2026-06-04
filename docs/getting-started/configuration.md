@@ -51,8 +51,8 @@ Saucebase modules keep their config files inside the module itself, not in the t
 
 | Module | Config file |
 |--------|-------------|
-| Auth (OAuth) | `modules/Auth/config/services.php` |
-| Billing | `modules/Billing/config/billing.php` |
+| Auth (OAuth) | `modules/auth/config/services.php` |
+| Billing | `modules/billing/config/billing.php` |
 | *(all modules)* | `modules/[Name]/config/` |
 
 This means you won't find OAuth credentials or billing settings in `config/services.php` — look inside the module folder instead.

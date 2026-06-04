@@ -45,7 +45,7 @@ npm run build
 This step is required. Without it, `$user->billingCustomer` and all subscription checks will fail. Apply the provided patch:
 
 ```bash
-git apply modules/Billing/patches/user.patch
+git apply modules/billing/patches/user.patch
 ```
 
 <details>
@@ -145,8 +145,8 @@ use Modules\Billing\Models\Product;
 **Vue page** — add the imports, prop, and template tag:
 
 ```ts title="resources/js/pages/Index.vue"
-import ProductSection from '@modules/Billing/resources/js/components/ProductSection.vue';
-import type { Product } from '@modules/Billing/resources/js/types';
+import ProductSection from '@modules/billing/resources/js/components/ProductSection.vue';
+import type { Product } from '@modules/billing/resources/js/types';
 // ...
 defineProps<{ products?: Product[] }>();
 ```

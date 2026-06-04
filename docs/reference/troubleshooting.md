@@ -247,7 +247,7 @@ cat vite.config.js
 ```bash
 # 1. Check page file exists
 ls -la resources/js/pages/Dashboard.vue
-ls -la modules/Auth/resources/js/pages/Login.vue
+ls -la modules/auth/resources/js/pages/Login.vue
 
 # 2. Rebuild assets
 npm run build
