@@ -18,7 +18,7 @@ You need **PHP 8.4+**, **Composer**, and the **Laravel installer**. If you don't
 ## Create Your App
 
 ```bash
-laravel new my-app --using=saucebase/saucebase
+laravel new my-app --using=saucebase/saucebase --phpunit --boost
 ```
 
 Open the URL shown in your terminal. The setup screen will guide you through choosing a frontend framework and installing your first modules.

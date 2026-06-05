@@ -23,8 +23,10 @@ If any are missing, tell the user to install them before continuing.
 ## Create the Application
 
 ```shell
-laravel new my-app --using=saucebase/saucebase
+laravel new my-app --using=saucebase/saucebase --phpunit --boost
 ```
+
+`--phpunit` is required — Saucebase uses PHPUnit and the test suite will break if Pest is chosen. `--boost` confirms the Boost installation already bundled in `composer.json` and skips the prompt.
 
 Open the URL shown in the terminal. The setup screen guides the user through choosing a frontend framework and installing modules. Do not run any further commands — the setup screen handles the remaining steps.
 
