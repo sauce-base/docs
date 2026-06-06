@@ -30,7 +30,7 @@ Using Claude Code, Cursor, or another coding agent? Paste this before you start:
 ```
 I'm building a SaaS with Saucebase — a modular Laravel starter kit.
 
-Read https://docs.saucebase.dev/for-agents.md for the project conventions, structure, and patterns. Treat it as the source of truth for how to add features, where files belong, and what commands to run.
+Read https://saucebase-dev.github.io/docs/for-agents.md for the project conventions, structure, and patterns. Treat it as the source of truth for how to add features, where files belong, and what commands to run.
 ```
 
 [Read the full agent guide →](pathname:///for-agents.md)
