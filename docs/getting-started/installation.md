@@ -28,12 +28,18 @@ Open the URL shown in your terminal. The setup screen will guide you through cho
 Using Claude Code, Cursor, or another coding agent? Paste this before you start:
 
 ```
-I'm building a SaaS with Saucebase — a modular Laravel starter kit.
+I'm building a new application with Saucebase — a modular Laravel SaaS starter kit.
 
-Read https://saucebase-dev.github.io/docs/for-agents.md for the project conventions, structure, and patterns. Treat it as the source of truth for how to add features, where files belong, and what commands to run.
+Fetch and follow the instructions from https://saucebase-dev.github.io/docs/for-agents.md Treat the returned Markdown as the source of truth for how to install, set up, and build with Saucebase in this session.
 ```
 
 [Read the full agent guide →](pathname:///for-agents.md)
+
+:::warning SQLite limitations
+The default installation uses SQLite, which is sufficient for basic development but does not support all features. Some Filament admin panel widgets and Billing module charts require MySQL-specific capabilities and may not display correctly with SQLite.
+
+For full functionality, configure the app to use **MySQL** — run it locally, or use [Laravel Herd](https://herd.laravel.com), [Laravel Sail](https://laravel.com/docs/sail), or Docker (`bash bin/setup-env`).
+:::
 
 <ModuleGrid
   title="Explore the Modules"

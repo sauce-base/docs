@@ -70,6 +70,7 @@
       "logo": "lucide:lock",
       "badge": "free",
       "href": "/modules/auth",
+      "frameworks": ["vue", "react"],
       "features": [
         {
           "icon": "lucide:log-in",
@@ -112,6 +113,7 @@
       "logo": "lucide:settings-2",
       "badge": "free",
       "href": "/modules/settings",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:user",
@@ -148,6 +150,7 @@
       "logo": "lucide:credit-card",
       "badge": "free",
       "href": "/modules/billing",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:shopping-cart",
@@ -174,7 +177,7 @@
           "details": "Payment events are verified and processed reliably. Duplicate events are safely ignored, and failed payments update subscription status automatically."
         }
       ],
-      "dependencies": ["auth"]
+      "dependencies": ["auth", "settings"]
     },
     {
       "id": "roadmap",
@@ -184,6 +187,7 @@
       "logo": "lucide:map",
       "badge": "free",
       "href": "/modules/roadmap",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:lightbulb",
@@ -220,6 +224,7 @@
       "logo": "lucide:megaphone",
       "badge": "free",
       "href": "/modules/announcements",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:layout-template",
@@ -262,6 +267,7 @@
       "logo": "lucide:palette",
       "badge": "free",
       "href": "/modules/themes",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:palette",
@@ -296,8 +302,9 @@
       "description": "Full-featured blog with posts, categories, tags, and a Filament admin panel for content management.",
       "color": "#ec4899",
       "logo": "lucide:newspaper",
-      "badge": "coming-soon",
-      "href": "#",
+      "badge": "new",
+      "href": "/modules/blog",
+      "frameworks": ["vue"],
       "features": [
         {
           "icon": "lucide:file-text",
@@ -327,34 +334,152 @@
       "dependencies": ["auth"]
     },
     {
-      "id": "teams",
-      "title": "Teams",
-      "description": "Multi-user team collaboration with role-based permissions, invitations, and team switching for B2B SaaS applications.",
+      "id": "webhooks",
+      "title": "Webhooks",
+      "description": "Send reliable HTTP callbacks to external services when events occur in your app, with delivery logs and retry handling.",
       "color": "#6b7280",
-      "logo": "lucide:users",
+      "logo": "lucide:webhook",
       "badge": "coming-soon",
       "href": "#",
+      "frameworks": ["vue"],
       "features": [
         {
-          "icon": "lucide:users",
-          "name": "Team Collaboration",
-          "description": "Multi-user teams",
-          "details": "Users can create and switch between multiple teams. All data is automatically scoped to the active team, making it straightforward to build B2B multi-tenant applications."
+          "icon": "lucide:zap",
+          "name": "Event Triggers",
+          "description": "Fire webhooks on any app event",
+          "details": "Register listeners for any application event and automatically dispatch an HTTP POST to configured endpoints. Supports custom payloads and per-event endpoint routing."
         },
         {
-          "icon": "lucide:key",
-          "name": "Role Permissions",
-          "description": "Role-based access control",
-          "details": "Built-in owner, admin, and member roles with permission checks via `$user->hasTeamPermission('billing')`. Role definitions are customizable to match your application's needs."
+          "icon": "lucide:list",
+          "name": "Delivery Logs",
+          "description": "Inspect every webhook attempt",
+          "details": "Every delivery attempt is logged with the request body, response status, and latency. Browse the full history from the admin panel to diagnose issues."
         },
         {
-          "icon": "lucide:mail-plus",
-          "name": "Invitations",
-          "description": "Team invitations by email",
-          "details": "Invite users to a team by email. Invited users receive an email with an accept link. Pending invitations are managed from the team settings page and expire after 7 days."
+          "icon": "lucide:refresh-cw",
+          "name": "Retry Handling",
+          "description": "Automatic retries with exponential backoff",
+          "details": "Failed deliveries are retried automatically with exponential backoff. You can also trigger a manual retry from the delivery log for any failed attempt."
+        },
+        {
+          "icon": "lucide:bell-off",
+          "name": "Failure Alerts",
+          "description": "Get notified when deliveries fail repeatedly",
+          "details": "After a configurable number of consecutive failures, an alert is sent to the team. Endpoints can be temporarily disabled to prevent noise during known outages."
         }
       ],
       "dependencies": ["auth"]
+    },
+    {
+      "id": "integrations",
+      "title": "Integrations",
+      "description": "Connect your app with third-party services like Slack, Zapier, and more through a unified integration layer.",
+      "color": "#6b7280",
+      "logo": "lucide:blocks",
+      "badge": "coming-soon",
+      "href": "#",
+      "frameworks": ["vue"],
+      "features": [
+        {
+          "icon": "lucide:slack",
+          "name": "Slack",
+          "description": "Send notifications to Slack channels",
+          "details": "Post messages to any Slack channel when events occur in your app. Supports custom message formatting, channel routing per event type, and OAuth app installation."
+        },
+        {
+          "icon": "lucide:webhook",
+          "name": "Zapier",
+          "description": "Trigger Zapier workflows from your app",
+          "details": "Connect to thousands of apps via Zapier triggers. Any event in your app can kick off a Zapier workflow without custom code."
+        },
+        {
+          "icon": "lucide:plug",
+          "name": "Custom Connections",
+          "description": "Build your own integration adapters",
+          "details": "A driver-based integration layer lets you implement custom adapters for any third-party service. Register them alongside the built-in drivers with no framework changes."
+        },
+        {
+          "icon": "lucide:layers",
+          "name": "Unified Layer",
+          "description": "One API for all integrations",
+          "details": "All integrations share a common interface for connecting, sending events, and handling credentials. Switching or adding providers requires no changes to your event code."
+        }
+      ],
+      "dependencies": ["auth"]
+    },
+    {
+      "id": "notifications",
+      "title": "Notifications",
+      "description": "In-app and email notifications with templates, user preferences, and delivery tracking for every channel.",
+      "color": "#6b7280",
+      "logo": "lucide:bell",
+      "badge": "coming-soon",
+      "href": "#",
+      "frameworks": ["vue"],
+      "features": [
+        {
+          "icon": "lucide:bell",
+          "name": "In-App",
+          "description": "Real-time notifications inside the app",
+          "details": "Notifications appear in a dropdown bell menu and are marked read on open. Unread count is updated in real time via broadcasting without a full page reload."
+        },
+        {
+          "icon": "lucide:mail",
+          "name": "Email",
+          "description": "Transactional email notifications",
+          "details": "Each notification type has a corresponding email template. Emails are queued and sent via Laravel's mail system — swap the driver (SMTP, Mailgun, SES) in the config."
+        },
+        {
+          "icon": "lucide:file-text",
+          "name": "Templates",
+          "description": "Editable notification templates",
+          "details": "In-app and email notification content is defined in template classes. Subject, body, and action URL are customizable per notification type without touching core code."
+        },
+        {
+          "icon": "lucide:sliders-horizontal",
+          "name": "Preferences",
+          "description": "Per-channel user preferences",
+          "details": "Users control which notifications they receive and on which channels from a preferences page. Preferences are evaluated before dispatch — muted channels are skipped entirely."
+        }
+      ],
+      "dependencies": ["auth"]
+    },
+    {
+      "id": "analytics",
+      "title": "Analytics",
+      "description": "Track pageviews, custom events, and user behavior with a privacy-friendly built-in dashboard — no third-party scripts.",
+      "color": "#6b7280",
+      "logo": "lucide:bar-chart-3",
+      "badge": "coming-soon",
+      "href": "#",
+      "frameworks": ["vue"],
+      "features": [
+        {
+          "icon": "lucide:eye",
+          "name": "Pageviews",
+          "description": "Automatic pageview tracking",
+          "details": "Every page navigation is tracked automatically via an Inertia event listener. No script tags or manual calls needed — views are recorded server-side with referrer and path."
+        },
+        {
+          "icon": "lucide:mouse-pointer-click",
+          "name": "Custom Events",
+          "description": "Track any user action",
+          "details": "Fire custom events from anywhere in the frontend with a single helper call. Events are batched and sent to a lightweight endpoint that writes them to the analytics store."
+        },
+        {
+          "icon": "lucide:layout-dashboard",
+          "name": "Dashboard",
+          "description": "Built-in analytics dashboard",
+          "details": "A Filament dashboard page visualises pageviews, unique visitors, top pages, and custom event counts over configurable date ranges. No third-party service required."
+        },
+        {
+          "icon": "lucide:shield",
+          "name": "Privacy First",
+          "description": "No cookies, no third-party scripts",
+          "details": "All data is stored in your own database. No cookies are set, no external scripts are loaded, and no personal data leaves your server — fully GDPR-compliant by default."
+        }
+      ],
+      "dependencies": []
     }
   ]
 }
