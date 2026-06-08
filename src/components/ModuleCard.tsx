@@ -22,6 +22,7 @@ export interface ModuleCardProps {
   href: string;
   features?: ModuleFeature[];
   dependencies?: string[];
+  frameworks?: string[];
 }
 
 const BADGE_LABELS: Record<string, string> = {
@@ -45,6 +46,11 @@ function resolveDependencyTitle(id: string): string {
   return mod ? mod.title : id;
 }
 
+const FRAMEWORK_LABELS: Record<string, string> = {
+  vue: 'Vue',
+  react: 'React',
+};
+
 export default function ModuleCard({
   title,
   description,
@@ -55,6 +61,7 @@ export default function ModuleCard({
   href,
   features = [],
   dependencies = [],
+  frameworks = [],
 }: ModuleCardProps): JSX.Element {
   const coverStyle = !coverImage
     ? { background: `linear-gradient(135deg, ${color}88, ${color}33)` }
@@ -83,6 +90,16 @@ export default function ModuleCard({
       <div className={styles.body}>
         <h3 className={styles.title}>{title}</h3>
         <p className={styles.description}>{description}</p>
+
+        {frameworks.length > 0 && (
+          <div className={styles.frameworkBadges}>
+            {frameworks.map(fw => (
+              <span key={fw} className={`${styles.frameworkBadge} ${styles[`fw_${fw}`] ?? ''}`}>
+                {FRAMEWORK_LABELS[fw] ?? fw}
+              </span>
+            ))}
+          </div>
+        )}
 
         {features.length > 0 && (
           <div className={styles.featuresRow}>
