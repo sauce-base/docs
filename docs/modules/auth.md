@@ -34,8 +34,8 @@ This module requires a EmailService configured in your app to send the magic lin
 **Docker:**
 ```bash
 composer require saucebase/auth
-docker compose exec workspace php artisan migrate
-docker compose exec workspace php artisan modules:seed --module=auth
+docker compose exec app php artisan migrate
+docker compose exec app php artisan modules:seed --module=auth
 npm run build
 ```
 
@@ -67,16 +67,15 @@ The trait adds `socialAccounts()`, `connected_providers`, and the disconnect hel
 
 ## Configuration
 
-### Default admin credentials
+### Creating an admin user
 
-The seeder creates a default admin account:
+There is no default admin account. After installing and registering, promote your account to admin via the CLI:
 
-- **Email:** `chef@saucebase.dev`
-- **Password:** `secretsauce`
+```bash
+php artisan auth:make-admin your@email.com
+```
 
-:::warning
-Change these before going to production.
-:::
+The command requires the user to already exist — register first via the app, then run the command.
 
 ### OAuth (optional)
 

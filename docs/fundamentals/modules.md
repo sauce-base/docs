@@ -95,7 +95,7 @@ modules/blogpost/
 After generation, activate the module:
 
 ```bash
-composer require saucebase/blogpost
+composer update saucebase/blogpost
 ```
 
 ## Adding Global Components

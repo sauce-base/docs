@@ -64,13 +64,13 @@ Once the application is created, load the `CLAUDE.md` or `AGENTS.md` in the proj
 
 ## After Creation
 
-Once the application has been created:
+Once the application has been created, ask the user to run in a new terminal:
 
 1. Enter the new project directory: `cd my-app`
 2. Start the development server:
 
 ```shell
-composer dev
+npm install && composer dev
 ```
 
 This runs the HTTP server, queue worker, and Vite asset pipeline in parallel.
@@ -92,7 +92,7 @@ Once the user confirms the setup screen is complete:
 
 - Read `frontend.json` to detect the active framework before writing any frontend code.
 - Run `php artisan modules:list` to see which modules are installed.
-- If the Auth module was installed: the admin panel is at `/admin` with default credentials `chef@saucebase.dev` / `secretsauce`. Ask the user to verify it loads.
+- If the Auth module was installed: the admin panel is at `/admin`. Create the first admin by running `php artisan auth:make-admin` (register an account via the app first, then promote it). Ask the user to verify it loads.
 
 ## Guidance
 
@@ -236,6 +236,7 @@ php artisan saucebase:recipe ModuleName   # scaffold a new module
 php artisan modules:list                  # list installed modules
 php artisan modules:sync                  # sync PHPUnit suite after adding/removing modules
 php artisan migrate                       # run all pending migrations
+php artisan auth:make-admin {email}        # promote a registered user to admin
 php artisan modules:seed --module=auth    # seed a module's initial data
 npm run build                             # production build
 composer analyse                          # PHPStan level 5
