@@ -378,11 +378,28 @@ class TestFixtures
 {
     public static function credentials(): array
     {
+        // Creates users on demand via factory and returns their credentials.
+        // admin/user get random emails; subscriber/cancelled use fixed emails
+        // so BillingTestHelper can resolve them via firstOrCreate.
+        $password = Str::password(12, symbols: false);
+
+        $admin = User::factory()->create(['password' => Hash::make($password), 'email_verified_at' => now()]);
+        $admin->syncRoles([Role::ADMIN->value]);
+
+        $user = User::factory()->create(['password' => Hash::make($password), 'email_verified_at' => now()]);
+        $user->syncRoles([Role::USER->value]);
+
+        $subscriber = User::firstOrCreate(['email' => 'subscriber@example.com'], [...]);
+        $subscriber->update(['password' => Hash::make($password)]);
+
+        $cancelled = User::firstOrCreate(['email' => 'cancelled@example.com'], [...]);
+        $cancelled->update(['password' => Hash::make($password)]);
+
         return [
-            'admin'      => ['email' => 'chef@saucebase.dev',       'password' => 'secretsauce'],
-            'user'       => ['email' => 'test@example.com',         'password' => 'secretsauce'],
-            'subscriber' => ['email' => 'subscriber@example.com',   'password' => 'secretsauce'],
-            'cancelled'  => ['email' => 'cancelled@example.com',    'password' => 'secretsauce'],
+            'admin'      => ['email' => $admin->email,      'password' => $password],
+            'user'       => ['email' => $user->email,       'password' => $password],
+            'subscriber' => ['email' => $subscriber->email, 'password' => $password],
+            'cancelled'  => ['email' => $cancelled->email,  'password' => $password],
         ];
     }
 }

@@ -35,8 +35,8 @@ This module requires a EmailService configured in your app to send billing-relat
 **Docker:**
 ```bash
 composer require saucebase/billing
-docker compose exec workspace php artisan migrate
-docker compose exec workspace php artisan modules:seed --module=billing
+docker compose exec app php artisan migrate
+docker compose exec app php artisan modules:seed --module=billing
 npm run build
 ```
 

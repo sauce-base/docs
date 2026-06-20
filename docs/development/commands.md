@@ -165,7 +165,7 @@ php artisan saucebase:install --no-interaction
 php artisan saucebase:recipe BlogPost
 
 # After scaffolding, activate and build
-composer require saucebase/blogpost
+composer update saucebase/blogpost
 npm run dev
 ```
 
