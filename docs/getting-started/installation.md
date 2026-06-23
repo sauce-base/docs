@@ -28,9 +28,7 @@ Open the URL shown in your terminal. The setup screen will guide you through cho
 Using Claude Code, Cursor, or another coding agent? Paste this before you start:
 
 ```
-I'm building a new application with Saucebase — a modular Laravel SaaS starter kit.
-
-Fetch and follow the instructions from https://saucebase-dev.github.io/docs/for-agents.md Treat the returned Markdown as the source of truth for how to install, set up, and build with Saucebase in this session.
+Before writing any code, fetch https://saucebase-dev.github.io/docs/for-agents.md — that's the agent guide for Saucebase, a modular Laravel SaaS starter kit. Follow it step by step.
 ```
 
 [Read the full agent guide →](pathname:///for-agents.md)

@@ -4,21 +4,26 @@ This page is for AI coding agents helping a developer start or work on a Sauceba
 
 ## How to Proceed
 
-- First, check whether the current directory already contains a Saucebase application (look for `artisan` and `frontend.json`).
-- If it does, check `frontend.json` for the active framework, then skip to the user's requested task.
-- If it does not, verify that `php`, `composer`, the Laravel installer CLI (`laravel`), and `node` are available.
-- If any are missing, use `php.new` to install them using the correct platform command below.
+- First, check whether `frontend.json` exists in the current directory — that is the reliable sign of a Saucebase application.
+- If it does, read `frontend.json` for the active framework, then skip to the user's requested task.
+- If it does not, run the prerequisite checks below before creating the application.
 
 ## Prerequisites
 
-Run quick version checks for:
+Run all checks even if one fails — use `;` not `&&`:
 
-- `php -v` (need 8.4+)
-- `composer -V`
-- `laravel --version`
-- `node -v` (need 22+)
+```shell
+php -v; composer -V; laravel --version; node -v
+```
 
-If `PHP`, `Composer`, or the Laravel installer are missing, use `php.new` to install them before continuing.
+Review the output and tell the user exactly what is missing or below the required version:
+
+- PHP 8.4+
+- Composer (any recent version)
+- Laravel installer CLI
+- Node 22+
+
+Ask if they want to install the missing tools before continuing — do not install anything automatically.
 
 If `node` is missing or below 22, install it with `nvm`:
 
@@ -54,19 +59,21 @@ After running one of these commands, tell the user to restart their terminal ses
 
 ## Create the Application
 
+Ask the user what they want to name their project. Use that name in the command below.
+
 ```shell
-laravel new my-app --using=saucebase/saucebase --phpunit --boost
+laravel new <name> --using=saucebase/saucebase --phpunit --boost
 ```
 
-`--phpunit` is required — Saucebase uses PHPUnit and the test suite will break if Pest is chosen. `--boost` confirms the Boost installation already bundled in `composer.json` and skips the interactive prompt.
+`--phpunit` is required — Saucebase uses PHPUnit and the test suite will break if Pest is chosen. `--boost` confirms the Boost installation already bundled in `composer.json` and skips the interactive prompt. If the installer asks which database to use, choose **SQLite** (the default).
 
 Once the application is created, load the `CLAUDE.md` or `AGENTS.md` in the project root immediately to pick up project-specific conventions for the session. Do not ask the user to restart.
 
 ## After Creation
 
-Once the application has been created, ask the user to run in a new terminal:
+Once the application has been created, tell the user to open a **separate terminal** and run:
 
-1. Enter the new project directory: `cd my-app`
+1. Enter the new project directory: `cd <name>`
 2. Start the development server:
 
 ```shell
@@ -75,9 +82,9 @@ npm install && composer dev
 
 This runs the HTTP server, queue worker, and Vite asset pipeline in parallel.
 
-The agent should avoid getting blocked by the long-running dev server. If it can manage the process in the background, that is fine; otherwise ask the user to keep `composer dev` running in a separate terminal while continuing with setup.
+Do not run `composer dev` yourself — it is a long-running process and must stay in the user's own terminal.
 
-3. Tell the user the application will be available at `http://localhost:8000` (or the URL printed by `composer dev`).
+3. The URL will be printed by `composer dev` — typically `http://localhost:8000`. Tell the user to use whatever URL appears in their terminal.
 4. Ask the user to open that URL — a **setup screen** will appear.
 5. Do not write any frontend code until the user has completed the setup screen.
 
@@ -88,11 +95,39 @@ The setup screen handles the remaining configuration steps — the agent should 
 - **Framework choice:** The user selects Vue 3 or React. This writes `frontend.json` to the project root.
 - **Module installation:** The user installs the modules they want (Auth, Billing, Settings, etc.). Modules are copied into `modules/` via Composer.
 
+Ask the user to tell you when the setup screen is complete before continuing.
+
 Once the user confirms the setup screen is complete:
 
-- Read `frontend.json` to detect the active framework before writing any frontend code.
-- Run `php artisan modules:list` to see which modules are installed.
-- If the Auth module was installed: the admin panel is at `/admin`. Create the first admin by running `php artisan auth:make-admin` (register an account via the app first, then promote it). Ask the user to verify it loads.
+1. Read `frontend.json` to detect the active framework before writing any frontend code.
+2. Run `php artisan modules:list` to see which modules are installed.
+3. Check for pending module patches:
+
+```shell
+find modules -name "*.patch" -path "*/patches/*"
+```
+
+If any `.patch` files are found, show the user what each one changes by reading them (`cat <patch-file>`), then apply each one:
+
+```shell
+git apply --whitespace=fix <patch-file>
+```
+
+After applying patches, run:
+
+```shell
+php artisan migrate
+```
+
+4. If the Auth module was installed:
+   - Tell the user to visit `http://localhost:8000/register` and create their account first.
+   - Once they confirm they've registered, ask for the email they used, then run:
+
+```shell
+php artisan auth:make-admin <email>
+```
+
+   - The admin panel is at `/admin`. Ask the user to verify it loads.
 
 ## Guidance
 
@@ -101,22 +136,17 @@ Once the user confirms the setup screen is complete:
 - Keep setup moving unless blocked by a missing dependency or an explicit choice the user must make.
 - Never write frontend code before `frontend.json` exists with a `"framework"` key — the setup screen has not completed yet.
 - Check `modules/` before assuming a feature does not exist — it may already be in an installed module.
-- When adding a migration, run `php artisan migrate` after creating it.
-- Commit messages follow the format `type(scope): subject` — all lowercase, max 150 chars.
 
 ## Example Outcome
 
-When everything is ready, the agent should leave the user with a Saucebase application running at `http://localhost:8000`, a dev server in their terminal, and a completed setup screen. Tell the user what framework and modules are active, then ask what they want to build.
+When everything is ready, the agent should leave the user with a Saucebase application running at the URL printed by `composer dev`, a dev server in their terminal, and a completed setup screen. Tell the user what framework and modules are active, then ask what they want to build.
 
-## Shipping to Production
-
-When the user is ready to deploy, [Laravel Forge](https://forge.laravel.com) and [Laravel Cloud](https://cloud.laravel.com) are the recommended hosting options for Saucebase applications.
-
+---
 ---
 
 ## Conventions Reference
 
-The sections below are reference material. Consult them while building features, not during initial setup.
+> **Reference only.** The sections below are for building features — not part of initial setup. Return here once the user starts asking you to write code.
 
 ### Detecting the Active Framework
 
@@ -231,24 +261,17 @@ route().current('settings.*')
 ### Commands Reference
 
 ```shell
-composer dev                              # start dev server (server + queue + Vite in parallel)
-php artisan saucebase:recipe ModuleName   # scaffold a new module
-php artisan modules:list                  # list installed modules
-php artisan modules:sync                  # sync PHPUnit suite after adding/removing modules
-php artisan migrate                       # run all pending migrations
-php artisan auth:make-admin {email}        # promote a registered user to admin
-php artisan modules:seed --module=auth    # seed a module's initial data
-npm run build                             # production build
-composer analyse                          # PHPStan level 5
-composer lint                             # Laravel Pint (PHP formatting)
-npm run lint                              # ESLint with auto-fix
-php artisan test                          # run all PHPUnit tests
-```
-
-Run PHPUnit with a higher memory limit to avoid OOM on the Modules suite:
-
-```shell
-php -d memory_limit=2048M artisan test
+composer dev                                    # start dev server (server + queue + Vite in parallel)
+php artisan saucebase:recipe ModuleName         # scaffold a new module
+php artisan modules:list                        # list installed modules
+php artisan migrate                             # run all pending migrations
+php artisan auth:make-admin {email}             # promote a registered user to admin
+php artisan modules:seed --module=auth          # seed a module's initial data
+npm run build                                   # production build
+composer analyse                                # PHPStan level 5
+composer lint                                   # Laravel Pint (PHP formatting)
+npm run lint                                    # ESLint with auto-fix
+php -d memory_limit=2048M artisan test          # run all PHPUnit tests (memory flag required)
 ```
 
 ### Testing Conventions
@@ -265,4 +288,3 @@ The default install uses SQLite, which is sufficient for most development. Switc
 - The Billing module's analytics charts are needed (require MySQL-specific features)
 - Any Filament admin widgets show errors about unsupported SQL functions
 
-To switch: run `bash bin/setup-env` (Docker) or configure [Laravel Herd](https://herd.laravel.com) / [Laravel Sail](https://laravel.com/docs/sail) locally, then update `DB_*` values in `.env`.
