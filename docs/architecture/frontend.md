@@ -10,12 +10,12 @@ Saucebase supports **Vue 3** and **React** as first-class frontend frameworks. Y
 
 ## Choosing a Framework
 
-On first run, Saucebase shows a setup screen where you pick Vue or React. Run the command it shows:
+The `saucebase new`/`saucebase install` CLI prompts you to pick Vue or React during setup. To select it directly (or switch before the choice is finalized):
 
 ```bash
-php artisan saucebase:stack vue
+saucebase stack vue
 # or
-php artisan saucebase:stack react
+saucebase stack react
 ```
 
 This is a one-time, irreversible operation — it flattens the framework files into `resources/js/` and removes the other framework's directory. Choose carefully.
