@@ -6,140 +6,53 @@ This page is for AI coding agents helping a developer start or work on a Sauceba
 
 - First, check whether `frontend.json` exists in the current directory — that is the reliable sign of a Saucebase application.
 - If it does, read `frontend.json` for the active framework, then skip to the user's requested task.
-- If it does not, run the prerequisite checks below before creating the application.
-
-## Prerequisites
-
-Run all checks even if one fails — use `;` not `&&`:
-
-```shell
-php -v; composer -V; laravel --version; node -v
-```
-
-Review the output and tell the user exactly what is missing or below the required version:
-
-- PHP 8.4+
-- Composer (any recent version)
-- Laravel installer CLI
-- Node 22+
-
-Ask if they want to install the missing tools before continuing — do not install anything automatically.
-
-If `node` is missing or below 22, install it with `nvm`:
-
-```shell
-nvm install 22 && nvm use 22
-```
-
-If `nvm` is not available, ask the user to install Node 22 from [nodejs.org](https://nodejs.org) before continuing.
-
-## Installing with php.new
-
-If `php`, `composer`, or `laravel` are missing, use `php.new` to install them.
-
-- macOS:
-
-```shell
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.4)"
-```
-
-- Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.4'))
-```
-
-- Linux:
-
-```shell
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.4)"
-```
-
-After running one of these commands, tell the user to restart their terminal session before continuing. If the agent needs the restarted shell to pick up the new tools, tell the user to re-run their original prompt after reopening the terminal.
+- If it does not, proceed to Create the Application below — no manual prerequisite checks needed, the installer handles them.
 
 ## Create the Application
 
-Ask the user what they want to name their project. Use that name in the command below.
+Ask the user for a project name and which frontend framework they want (Vue or React) — those are the only two decisions needed upfront. Then run:
 
 ```shell
-laravel new <name> --using=saucebase/saucebase --phpunit --boost
+curl -fsSL https://install.saucebase.dev | bash -s -- <name> --stack=vue --driver=native --modules=none --force
 ```
 
-`--phpunit` is required — Saucebase uses PHPUnit and the test suite will break if Pest is chosen. `--boost` confirms the Boost installation already bundled in `composer.json` and skips the interactive prompt. If the installer asks which database to use, choose **SQLite** (the default).
+Swap `--stack=vue` for `--stack=react` if they chose React. This one command installs PHP/Composer if missing, installs the `saucebase` CLI, scaffolds the app, creates `.env`, generates `APP_KEY`, runs migrations, and selects the frontend framework — nothing manual is required afterward. Ask about modules only if the user already knows which ones they want; otherwise pass `--modules=none` and let them install modules later with `saucebase stack`/`composer require saucebase/<module>` (see Working with Modules below). If they already have PHP + Composer, the equivalent explicit form is `composer global require saucebase/installer && saucebase new <name> --stack=vue --driver=native --modules=none --force`.
 
-Once the application is created, load the `CLAUDE.md` or `AGENTS.md` in the project root immediately to pick up project-specific conventions for the session. Do not ask the user to restart.
+Once the application is created, load the `CLAUDE.md` or `AGENTS.md` in the project root immediately to pick up project-specific conventions for the session.
 
 ## After Creation
 
-Once the application has been created, tell the user to open a **separate terminal** and run:
-
-1. Enter the new project directory: `cd <name>`
-2. Start the development server:
+Tell the user to open a **separate terminal**, `cd <name>`, and run:
 
 ```shell
-npm install && composer dev
+composer dev
 ```
 
-This runs the HTTP server, queue worker, and Vite asset pipeline in parallel.
+This runs the HTTP server, queue worker, and Vite asset pipeline in parallel. Do not run it yourself — it is long-running and must stay in the user's own terminal. The URL is printed by `composer dev`, typically `http://localhost:8000`.
 
-Do not run `composer dev` yourself — it is a long-running process and must stay in the user's own terminal.
+Read `frontend.json` to confirm the active framework before writing any frontend code. Run `php artisan modules:list` to see which modules are installed.
 
-3. The URL will be printed by `composer dev` — typically `http://localhost:8000`. Tell the user to use whatever URL appears in their terminal.
-4. Ask the user to open that URL — a **setup screen** will appear.
-5. Do not write any frontend code until the user has completed the setup screen.
-
-## Setup Screen
-
-The setup screen handles the remaining configuration steps — the agent should not attempt to replicate these manually:
-
-- **Framework choice:** The user selects Vue 3 or React. This writes `frontend.json` to the project root.
-- **Module installation:** The user installs the modules they want (Auth, Billing, Settings, etc.). Modules are copied into `modules/` via Composer.
-
-Ask the user to tell you when the setup screen is complete before continuing.
-
-Once the user confirms the setup screen is complete:
-
-1. Read `frontend.json` to detect the active framework before writing any frontend code.
-2. Run `php artisan modules:list` to see which modules are installed.
-3. Check for pending module patches:
-
-```shell
-find modules -name "*.patch" -path "*/patches/*"
-```
-
-If any `.patch` files are found, show the user what each one changes by reading them (`cat <patch-file>`), then apply each one:
-
-```shell
-git apply --whitespace=fix <patch-file>
-```
-
-After applying patches, run:
-
-```shell
-php artisan migrate
-```
-
-4. If the Auth module was installed:
-   - Tell the user to visit `http://localhost:8000/register` and create their account first.
-   - Once they confirm they've registered, ask for the email they used, then run:
+If the Auth module was installed:
+- Tell the user to visit `http://localhost:8000/register` and create their account first.
+- Once they confirm they've registered, ask for the email they used, then run:
 
 ```shell
 php artisan auth:make-admin <email>
 ```
 
-   - The admin panel is at `/admin`. Ask the user to verify it loads.
+- The admin panel is at `/admin`. Ask the user to verify it loads.
 
 ## Guidance
 
-- Ask only for decisions that materially affect the application — framework choice and which modules to install are the only required choices during setup.
+- Ask only for decisions that materially affect the application — framework choice is the main one needed upfront.
 - Prefer Saucebase defaults when the user has not expressed a preference.
 - Keep setup moving unless blocked by a missing dependency or an explicit choice the user must make.
-- Never write frontend code before `frontend.json` exists with a `"framework"` key — the setup screen has not completed yet.
+- Never write frontend code before `frontend.json` exists with a `"framework"` key.
 - Check `modules/` before assuming a feature does not exist — it may already be in an installed module.
 
 ## Example Outcome
 
-When everything is ready, the agent should leave the user with a Saucebase application running at the URL printed by `composer dev`, a dev server in their terminal, and a completed setup screen. Tell the user what framework and modules are active, then ask what they want to build.
+When everything is ready, the agent should leave the user with a Saucebase application running at the URL printed by `composer dev` and a dev server in their terminal. Tell the user what framework is active, then ask what they want to build.
 
 ---
 ---
@@ -158,7 +71,7 @@ Always check `frontend.json` at the project root before writing any frontend cod
 
 - `"framework": "vue"` — write Vue 3 Composition API (`.vue` files, `<script setup>`, composables)
 - `"framework": "react"` — write React with hooks (`.tsx` files, `hooks/`)
-- File absent or `"framework": null` — setup is not yet complete; tell the user to visit the app and finish the setup screen first
+- File absent or `"framework": null` — the install flow hasn't finished; re-run `saucebase install` before writing frontend code
 
 ### Where Files Live
 

@@ -60,7 +60,7 @@ Saucebase gives you a production-ready SaaS architecture — scalable, secure, e
 
 Saucebase ships a complete development environment so your team is productive from day one:
 
-- **One-command setup** — `bash bin/setup-env` starts everything: Docker containers, SSL certificates, database, assets. Be running in minutes, not hours.
+- **One-command setup** — `curl -fsSL https://install.saucebase.dev | bash` handles everything: PHP/Composer, Docker containers, SSL certificates, database, assets. Be running in minutes, not hours.
 - **Instant hot reload**: See your changes immediately in the browser with [HMR](/reference/glossary#hmr-hot-module-replacement) (no page refresh needed)
 - **Type-safe routes**: [Ziggy](/reference/glossary#ziggy) generates TypeScript helpers from your Laravel routes, so you get autocomplete and type checking
 - **SSR when you need it**: Enable [server-side rendering](/reference/glossary#ssr-server-side-rendering) for specific pages to improve SEO and performance
@@ -116,31 +116,21 @@ Commitlint for conventional commits
 
 ## Quick Start
 
-You can get Saucebase running in just a few minutes. Only **[Docker](https://www.docker.com)** and **[Node.js](https://nodejs.org)** are required:
+You can get Saucebase running in just a few minutes — no local PHP required:
 
 ```bash
-git clone https://github.com/saucebase-dev/saucebase.git my-app
-cd my-app
-bash bin/setup-env
+curl -fsSL https://install.saucebase.dev | bash
 ```
 
-Open `https://localhost` in your browser and you're ready to build!
+The CLI walks you through the rest: environment driver (Docker or native), frontend framework, and modules.
 
 :::tip What does this do?
-The bootstrap script starts Docker containers (MySQL, Redis, Mailpit), generates SSL certificates, installs dependencies, runs migrations, enables modules, and builds frontend assets. No local PHP required.
+The bootstrap installs PHP/Composer if missing, installs the `saucebase` CLI, then runs the full install flow — Docker containers (MySQL, Redis, Mailpit) or a native setup, SSL certificates if requested, migrations, and frontend assets.
 :::
 
-[Modules](/reference/glossary#module) are self-contained features that install into your codebase. You can use the pre-built ones or create your own.
+[Modules](/reference/glossary#module) are self-contained features that install into your codebase. You can use the pre-built ones or create your own, and the CLI's module prompt during `saucebase new`/`saucebase install` handles picking, requiring, and migrating them for you.
 
-**Installing a module is simple:**
-
-```bash
-php artisan saucebase:install
-```
-
-The interactive installer prompts you to choose modules, runs `composer require`, and runs migrations. The code lands in your `modules/` directory — open the files and modify them however you want.
-
-If you prefer to install a single module manually:
+If you prefer to install a single module manually into an existing app:
 
 ```bash
 composer require saucebase/auth
