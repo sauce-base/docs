@@ -106,43 +106,6 @@
       "dependencies": []
     },
     {
-      "id": "settings",
-      "title": "Settings",
-      "description": "Account settings pages for managing profile info, avatar, password, and connected social accounts.",
-      "color": "#0ea5e9",
-      "logo": "lucide:settings-2",
-      "badge": "free",
-      "href": "/modules/settings",
-      "frameworks": ["vue"],
-      "features": [
-        {
-          "icon": "lucide:user",
-          "name": "Profile Info",
-          "description": "Update your name and email",
-          "details": "Users can update their display name and email address from their account settings page."
-        },
-        {
-          "icon": "lucide:image",
-          "name": "Avatar Upload",
-          "description": "Upload a profile picture",
-          "details": "Users can upload a custom profile photo. If no photo is set, the avatar falls back to the one from their connected social account, then to a default image."
-        },
-        {
-          "icon": "lucide:key",
-          "name": "Password Change",
-          "description": "Change your password securely",
-          "details": "Users can update their password after confirming their current one. An email notification is sent when the password is changed."
-        },
-        {
-          "icon": "lucide:link",
-          "name": "Connected Accounts",
-          "description": "Manage linked social login providers",
-          "details": "Users can see which social providers (Google, GitHub) are connected to their account and disconnect them when needed."
-        }
-      ],
-      "dependencies": ["auth"]
-    },
-    {
       "id": "billing",
       "title": "Billing",
       "description": "Subscription management and payment processing via Stripe with checkout sessions, billing portal, invoices, and webhook processing.",
@@ -177,7 +140,7 @@
           "details": "Payment events are verified and processed reliably. Duplicate events are safely ignored, and failed payments update subscription status automatically."
         }
       ],
-      "dependencies": ["auth", "settings"]
+      "dependencies": ["auth"]
     },
     {
       "id": "roadmap",

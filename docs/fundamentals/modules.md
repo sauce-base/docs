@@ -189,5 +189,4 @@ php artisan migrate:status
 ## Next Steps
 
 - **[Auth Module](../modules/auth)** — Authentication, OAuth, and user impersonation
-- **[Settings Module](../modules/settings)** — User profile and avatar management
 - **[Billing Module](../modules/billing)** — Subscriptions and payment processing

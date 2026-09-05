@@ -132,11 +132,11 @@ Navigation::addIf(
 
 Modules register navigation in their own `routes/navigation.php`. The file is loaded automatically when the module is installed.
 
-```php title="modules/settings/routes/navigation.php"
+```php title="modules/auth/routes/navigation.php"
 use App\Facades\Navigation;
 use App\Navigation\Section;
 
-Navigation::add('Settings', fn () => route('settings.index'), function (Section $section) {
+Navigation::add('Settings', fn () => route('settings.profile'), function (Section $section) {
     $section->attributes([
         'group' => 'user',
         'slug' => 'settings',
