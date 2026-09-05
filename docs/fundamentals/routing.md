@@ -46,11 +46,11 @@ Use namespace syntax to render pages from `modules/<modulename>/resources/js/pag
 // Renders: modules/auth/resources/js/pages/Login.vue
 return Inertia::render('Auth::Login');
 
-// Renders: modules/settings/resources/js/pages/Index.vue
-return Inertia::render('Settings::Index');
+// Renders: modules/auth/resources/js/pages/Profile.vue
+return Inertia::render('Auth::Profile');
 
-// Renders: modules/settings/resources/js/pages/Profile/Edit.vue
-return Inertia::render('Settings::Profile/Edit');
+// Renders: modules/auth/resources/js/pages/Profile/Edit.vue
+return Inertia::render('Auth::Profile/Edit');
 ```
 
 **Namespace format**: `ModuleName::PagePath`

@@ -5,7 +5,7 @@ description: Authentication, social login, email verification, and admin imperso
 
 # Auth Module
 
-The Auth module handles everything related to user identity: email/password login, registration, password reset, email verification, OAuth via Google and GitHub, and admin impersonation. It is the foundation that all other modules depend on.
+The Auth module handles everything related to user identity: email/password login, registration, password reset, email verification, OAuth via Google and GitHub, account profile management, and admin impersonation. It is the foundation that all other modules depend on.
 
 ## What you get
 
@@ -15,6 +15,7 @@ The Auth module handles everything related to user identity: email/password logi
 - **Email verification** — signed links; users can request a resend from the prompt page
 - **Social login (OAuth)** — Google and GitHub via Laravel Socialite. Guests can log in or register; authenticated users can link additional providers to their account
 - **Provider disconnect protection** — a user cannot disconnect their only login method (no password + one social account)
+- **Account profile** — a settings area at `/settings/profile` where users view their details, edit their name and email, upload or remove an avatar, change their password, and manage connected social accounts
 - **Admin panel** — Filament resource at `/admin` to list, create, view, and edit users
 - **User impersonation** — admins can impersonate any user from the admin panel; up to 3 recently impersonated users are shown for quick switching
 
@@ -41,7 +42,7 @@ npm run build
 
 ### Add the Sociable trait to your User model
 
-This step is required for social login and the Settings module's provider display to work. Apply the provided patch:
+This step is required for social login and the connected-accounts display on the profile page to work. Apply the provided patch:
 
 ```bash
 git apply modules/auth/patches/user.patch
@@ -126,6 +127,31 @@ AUTH_MAGIC_LINK_EXPIRY=15
 ```
 
 When disabled, the `/auth/magic-link` routes return 404 and the link is hidden on the login page.
+
+## Account profile
+
+Signed-in users manage their own account under `/settings/profile`. The module registers
+the pages; the surrounding settings layout and sidebar come from the app itself, so other
+modules can add their own entries to the same settings sidebar.
+
+| Route | What it does |
+| ----- | ------------ |
+| `settings.profile` | Read-only overview: avatar, name, email, last login, connected social accounts |
+| `settings.profile.edit` | Edit name and email; upload or remove an avatar |
+| `settings.profile.password.edit` | Change password (requires the current password) |
+
+**Avatars** are stored via Spatie Media Library in an `avatars` collection. Uploads accept
+JPEG, PNG, GIF, and WebP up to 2 MB, and a new upload replaces the previous one.
+
+**Connected accounts** are listed on the profile page when Socialite is configured. Users can
+connect an enabled provider or disconnect one they have already linked. A provider that has
+since been disabled still appears if the user is connected to it, so the account can always
+be disconnected.
+
+:::note
+These routes keep the `/settings/*` paths they had when profile management shipped as a
+separate Settings module, so existing links and bookmarks continue to work.
+:::
 
 ## Admin panel
 
