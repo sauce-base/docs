@@ -43,7 +43,6 @@ Saucebase uses PHPUnit for backend testing with three test suites configured in 
 - `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:` — in-memory SQLite, no teardown needed
 - `QUEUE_CONNECTION=sync` — jobs run inline
 - `BCRYPT_ROUNDS=4` — faster password hashing in tests
-- `TELESCOPE_ENABLED=false`, `PULSE_ENABLED=false` — observability tools disabled
 
 The base `TestCase` seeds the database before each test class (`$seed = true`) and provides a `createUser()` helper that creates a factory user and assigns the `user` role.
 

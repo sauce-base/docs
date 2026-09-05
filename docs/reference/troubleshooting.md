@@ -417,7 +417,7 @@ docker compose restart mysql
 DB::enableQueryLog();
 
 # 2. Check for N+1 query problems
-# Use: php artisan debugbar:publish (Laravel Debugbar)
+# Add to AppServiceProvider boot(): Model::preventLazyLoading(! app()->isProduction());
 
 # 3. Cache configuration
 php artisan config:cache
